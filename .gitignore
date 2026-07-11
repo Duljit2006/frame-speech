@@ -1,0 +1,41 @@
+# Virtual Environments
+venv/
+env/
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# AI Models & Cache
+models_cache/
+.cache/
+*.pt
+*.pth
+*.onnx
+
+# Application Data & Media
+data/
+downloads/
+raw_audio/
+processed_audio/
+*.mp4
+*.wav
+*.mp3
+*.srt
+*.txt
+
+# IDEs and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Graphify Outputs
+graphify-out/

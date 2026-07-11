@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrameSpeech | AI Audio Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3V21M6 8V16M18 8V16M3 11V13M21 11V13" stroke="var(--primary-text)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>FrameSpeech</span>
+            </div>
+            <div class="nav-links">
+                <a href="#hero">Home</a>
+                <a href="#models">Models</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-content">
+            <h1>Decode Every Voice,<br>In Every Frame.</h1>
+            <p>Advanced AI language identification, extraction, and transcription built for noisy, real-world video content.</p>
+            <a href="#models" class="btn btn-primary">Explore Models</a>
+        </div>
+        <div class="hero-decoration">
+            <div class="deco-circle deco-coral"></div>
+            <div class="deco-circle deco-sage"></div>
+            <div class="deco-circle deco-gold"></div>
+        </div>
+    </section>
+
+    <!-- Models Section -->
+    <section id="models" class="models-section">
+        <div class="container">
+            <h2>Select a Model</h2>
+            
+            <div class="model-grid">
+                <!-- Model 1: Extractor -->
+                <div class="model-card theme-coral" data-target="workspace-extractor">
+                    <div class="card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                    </div>
+                    <h3>Audio Extractor</h3>
+                    <p>Instantly rip, convert, and download 16kHz mono audio from any YouTube URL or video file.</p>
+                    <button class="btn btn-outline">Try Now</button>
+                </div>
+
+                <!-- Model 2: Language Detector -->
+                <div class="model-card theme-sage" data-target="workspace-lid">
+                    <div class="card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <h3>Language Detector</h3>
+                    <p>Detect exact timestamps when speakers switch languages. Powered by SpeechBrain & Whisper.</p>
+                    <button class="btn btn-outline">Try Now</button>
+                </div>
+
+                <!-- Model 3: Smart Transcriber -->
+                <div class="model-card theme-gold" data-target="workspace-transcriber">
+                    <div class="card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h3>Smart Transcriber</h3>
+                    <p>Code-switched transcription that automatically understands when speakers mix multiple languages.</p>
+                    <button class="btn btn-outline">Try Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workspaces Area (Hidden by default) -->
+    <section id="workspace-area" class="workspace-area hidden">
+        <div class="container container-wide">
+            <button id="close-workspace" class="btn-text">← Back to Models</button>
+            
+            <!-- Workspace: Extractor -->
+            <div id="workspace-extractor" class="workspace-content hidden">
+                <div class="workspace-header theme-coral">
+                    <h2>Audio Extractor</h2>
+                    <p>Paste a link or upload a file to extract audio.</p>
+                </div>
+                
+                <div class="input-zone">
+                    <div class="url-input-group">
+                        <input type="text" id="ext-url-input" placeholder="Paste YouTube URL here...">
+                        <button id="ext-submit-url" class="btn btn-primary theme-coral">Extract</button>
+                    </div>
+                    
+                    <div class="divider"><span>OR</span></div>
+                    
+                    <div class="drop-zone" id="ext-drop-zone">
+                        <p>Drag & drop a video/audio file here<br><span>or click to browse</span></p>
+                        <input type="file" id="ext-file-input" hidden>
+                    </div>
+                </div>
+
+                <div id="ext-status" class="status-zone hidden">
+                    <div class="loader">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <p class="status-text">Processing...</p>
+                    <p class="job-id-text">Job ID: <span id="ext-job-id"></span></p>
+                    <p class="job-id-text small">You can leave this page. Your files will be kept for 25 minutes.</p>
+                </div>
+
+                <div id="ext-results" class="results-zone hidden">
+                    <h3>Extraction Complete</h3>
+                    <div id="ext-video-container" class="video-container hidden"></div>
+                    
+                    <div class="audio-player-card">
+                        <p class="filename" id="ext-filename">audio.wav</p>
+                        <audio id="ext-audio" controls></audio>
+                        <a id="ext-download-btn" class="btn btn-primary theme-coral" download>Download WAV</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace: LID -->
+            <div id="workspace-lid" class="workspace-content hidden">
+                <div class="workspace-header theme-sage">
+                    <h2>Language Detector</h2>
+                    <p>Detect language switches and generate a timeline.</p>
+                </div>
+                
+                <div class="input-zone">
+                    <div class="url-input-group">
+                        <input type="text" id="lid-url-input" placeholder="Paste YouTube URL here...">
+                        <button id="lid-submit-url" class="btn btn-primary theme-sage">Detect</button>
+                    </div>
+                    
+                    <div class="divider"><span>OR</span></div>
+                    
+                    <div class="drop-zone" id="lid-drop-zone">
+                        <p>Drag & drop a video/audio file here<br><span>or click to browse</span></p>
+                        <input type="file" id="lid-file-input" hidden>
+                    </div>
+                </div>
+
+                <div id="lid-status" class="status-zone hidden">
+                    <div class="loader theme-sage">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <p class="status-text">Analyzing audio with AI...</p>
+                    <p class="job-id-text">Job ID: <span id="lid-job-id"></span></p>
+                    <p class="job-id-text small">You can leave this page. Your results will be kept for 25 minutes.</p>
+                </div>
+
+                <div id="lid-results" class="results-zone hidden">
+                    <div class="results-grid">
+                        <div class="results-left">
+                            <div id="lid-video-container" class="video-container hidden"></div>
+                            
+                            <div class="stats-card">
+                                <h3>Language Summary</h3>
+                                <div id="lid-summary-chart" class="summary-chart"></div>
+                                <div id="lid-summary-legend" class="summary-legend"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="results-right">
+                            <div class="timeline-card scrollable-timeline">
+                                <h3>Smoothed Timeline</h3>
+                                <div class="table-responsive">
+                                    <table class="timeline-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Time Range</th>
+                                                <th>Duration</th>
+                                                <th>Language</th>
+                                                <th>Confidence</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="lid-timeline-body">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace: Transcriber -->
+            <div id="workspace-transcriber" class="workspace-content hidden">
+                <div class="workspace-header theme-gold">
+                    <h2>Smart Transcriber</h2>
+                    <p>Get full code-switched transcription with sentence-level timestamps.</p>
+                </div>
+                
+                <div class="input-zone">
+                    <div class="url-input-group">
+                        <input type="text" id="tx-url-input" placeholder="Paste YouTube URL here...">
+                        <button id="tx-submit-url" class="btn btn-primary theme-gold">Transcribe</button>
+                    </div>
+                    
+                    <div class="divider"><span>OR</span></div>
+                    
+                    <div class="drop-zone" id="tx-drop-zone">
+                        <p>Drag & drop a video/audio file here<br><span>or click to browse</span></p>
+                        <input type="file" id="tx-file-input" hidden>
+                    </div>
+
+                    <div class="options-row">
+                        <div class="option-group">
+                            <label for="tx-model-size">Whisper Model</label>
+                            <select id="tx-model-size" class="styled-select">
+                                <option value="tiny">Tiny (~0.15 GB)</option>
+                                <option value="base">Base (~0.3 GB)</option>
+                                <option value="small" selected>Small (~0.6 GB) — Recommended</option>
+                                <option value="medium">Medium (~1.6 GB)</option>
+                                <option value="large-v3">Large v3 (~3.0 GB)</option>
+                            </select>
+                        </div>
+                        <div class="option-group">
+                            <label>Task</label>
+                            <div class="toggle-group">
+                                <button class="toggle-btn active" data-task="transcribe">Transcribe</button>
+                                <button class="toggle-btn" data-task="translate">Translate to English</button>
+                            </div>
+                        </div>
+                        <div class="option-group">
+                            <label>Whisper Hinting</label>
+                            <div class="toggle-group">
+                                <button class="toggle-btn active" id="btn-hint-lid">Use LID Hints</button>
+                                <button class="toggle-btn" id="btn-hint-auto">Auto-Detect</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tx-status" class="status-zone hidden">
+                    <div class="loader theme-gold">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <p class="status-text">Transcribing audio with AI...</p>
+                    <p class="job-id-text">Job ID: <span id="tx-job-id"></span></p>
+                    <p class="job-id-text small">This may take several minutes. You can leave and come back.</p>
+                </div>
+
+                <div id="tx-results" class="results-zone hidden">
+                    <div class="results-grid">
+                        <div class="results-left">
+                            <div id="tx-video-container" class="video-container hidden"></div>
+                            
+                            <div class="stats-card">
+                                <h3>Language Summary</h3>
+                                <div id="tx-lid-chart" class="summary-chart"></div>
+                                <div id="tx-lid-legend" class="summary-legend"></div>
+                            </div>
+
+                            <div class="download-group">
+                                <a id="tx-download-srt" class="btn btn-primary theme-gold" download>⬇ Download SRT</a>
+                                <a id="tx-download-txt" class="btn btn-outline" download>⬇ Download TXT</a>
+                            </div>
+                        </div>
+                        
+                        <div class="results-right">
+                            <div class="transcript-card scrollable-timeline">
+                                <h3>Transcript</h3>
+                                <div id="tx-transcript-body" class="transcript-body"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="js/app.js"></script>
+    <script src="js/extractor.js"></script>
+    <script src="js/lid.js"></script>
+    <script src="js/transcriber.js"></script>
+</body>
+</html>

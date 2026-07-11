@@ -1,0 +1,26 @@
+# Models and Cache
+models_cache/
+__pycache__/
+*.pyc
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Audio / Video testing files
+*.wav
+*.mp4
+*.mkv
+*.mp3
+*.aac
+*.ogg
+*.flac
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Virtual Environments
+venv/
+env/
+.env
