@@ -26,29 +26,34 @@ When speakers mix multiple languages (e.g., speaking English and Hindi in the sa
 - **🔇 Smart Silence Filtering:** Uses Silero VAD to detect exact timestamps of human speech, throwing away background music and silence to save GPU memory.
 - **🧠 Granular Language Detection:** Chops speech into 3-second overlapping windows and analyzes them using SpeechBrain (ECAPA-TDNN).
 - **⏱️ Timeline Smoothing:** Applies a non-linear median filter to fix AI hallucinations and create a cohesive language timeline.
-- **✍️ Guided Smart Transcription:** Feeds the exact language timeline into OpenAI's Whisper model to enforce the correct alphabet and language during transcription.
-- **✨ Beautiful Web Interface:** A completely asynchronous Vanilla JS + HTML/CSS frontend with Server-Sent Events (SSE) for live job tracking.
+- **✍️ Guided Smart Transcription:** Feeds the exact language timeline into OpenAI's `faster-whisper` model to enforce the correct alphabet and language during transcription.
+- **🤖 Gemini AI Text Correction:** A powerful post-processing layer using a full-context batching algorithm to merge fragmented sentences, enforce proper native orthography (like Assamese), and preserve English loanwords.
+- **✨ Beautiful Web Interface:** A completely asynchronous Vanilla JS + HTML/CSS frontend featuring Server-Sent Events (SSE) for live tracking, Dual Language Analytics charts, and dynamic code-switch highlighting.
 
 ## 🏗️ Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph TD
-    A[Raw Video / Audio URL] -->|yt-dlp + FFmpeg| B(Audio Extractor)
-    B -->|16kHz Mono WAV| C(Voice Activity Detector)
-    C -->|Removes Silence| D(Segmentation Engine)
-    D -->|3-Second Chunks| E(Language Detector)
-    E -->|SpeechBrain + Whisper| F(Timeline Smoother)
-    F -->|Clean Language Timeline| G(Smart Transcriber)
-    G -->|Subtitles| H[Final Outputs: SRT, TXT & Web UI]
-    
-    style A fill:#e2e2e2,stroke:#333,stroke-width:2px
-    style H fill:#81B29A,stroke:#333,stroke-width:2px
-    style B fill:#E07A5F,stroke:#333
-    style C fill:#F2CC8F,stroke:#333
-    style D fill:#3D2C2E,stroke:#333,color:#fff
-    style E fill:#8B7E74,stroke:#333,color:#fff
-    style F fill:#E8DDD3,stroke:#333
-    style G fill:#B5838D,stroke:#333,color:#fff
+    A["🎬 Raw Video / Audio URL"] -->|"Downloads & Rips"| B("1. Audio Extractor")
+    B -->|"16kHz Mono WAV"| C("2. Voice Activity Detector")
+    C -->|"Removes Silence"| D("3. Segmentation Engine")
+    D -->|"3-Second Chunks"| E("4. Language Detector")
+    E -->|"Raw AI Predictions"| F("5. Timeline Smoother")
+
+    F -->|"Clean Language Timeline"| G("6. Whisper Transcriber")
+    G -->|"Raw Transcript Segments"| H("7. Gemini Text Corrector")
+    H -->|"Corrected Sentences"| I["📄 Final Outputs: SRT, TXT & Web UI"]
+
+    style A fill:#e2e2e2,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#E07A5F,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#F2CC8F,stroke:#333,stroke-width:2px,color:#000
+    style D fill:#3D2C2E,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#8B7E74,stroke:#333,stroke-width:2px,color:#fff
+    style F fill:#E8DDD3,stroke:#333,stroke-width:2px,color:#000
+    style G fill:#457B9D,stroke:#333,stroke-width:2px,color:#fff
+    style H fill:#B5838D,stroke:#333,stroke-width:2px,color:#fff
+    style I fill:#81B29A,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ## 🛠️ Setup & Installation
@@ -71,12 +76,18 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-**3. Install dependencies**
+**3. Environment Variables**
+Create a `.env` file in the project root directory and add your Google Gemini API key (required for Model 3 Text Correction):
+```ini
+GEMINI_API_KEY="your_api_key_here"
+```
+
+**4. Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-**4. Run the Application**
+**5. Run the Application**
 If you are on Windows, simply double-click the `start_server.bat` file in the root directory!
 Alternatively, run:
 ```bash
