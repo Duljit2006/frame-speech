@@ -63,7 +63,7 @@ class TextCorrectionProcessor:
         segment_map = {seg["id"]: seg for seg in segments}
         full_context_text = " ".join([seg["text"] for seg in segments])
         
-        BATCH_SIZE = 30
+        BATCH_SIZE = 100
         new_segments = []
         new_id = 1
         
@@ -116,10 +116,14 @@ class TextCorrectionProcessor:
             )
             
             try:
+                import time
+                # Pace requests by waiting 3 seconds before each new batch (avoids rapid spiking)
+                if i > 0:
+                    time.sleep(3)
+                    
                 print(f"  [TextCorrector] Sending batch {i//BATCH_SIZE + 1} to Gemini ({len(batch)} segments)...")
                 
                 max_retries = 4
-                base_delay = 2
                 response = None
                 
                 for attempt in range(max_retries):
@@ -137,9 +141,12 @@ class TextCorrectionProcessor:
                     except Exception as api_err:
                         err_str = str(api_err)
                         if ("503" in err_str or "UNAVAILABLE" in err_str or "429" in err_str) and attempt < max_retries - 1:
-                            delay = base_delay * (2 ** attempt)
-                            print(f"  [TextCorrector] Gemini API busy ({api_err}). Retrying in {delay}s... (Attempt {attempt+1}/{max_retries})")
-                            import time
+                            # If the API tells us exactly how long to wait, extract it. Otherwise fallback to 15s.
+                            import re
+                            match = re.search(r"retry in ([0-9.]+)s", err_str)
+                            delay = float(match.group(1)) + 1 if match else 15.0
+                            
+                            print(f"  [TextCorrector] Gemini API busy. Retrying in {delay:.1f}s... (Attempt {attempt+1}/{max_retries})")
                             time.sleep(delay)
                         else:
                             raise api_err
