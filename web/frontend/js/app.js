@@ -1,5 +1,34 @@
 // Common Utilities & App Logic
 const App = {
+    LanguageColorMap: {
+        'English': '#457B9D',     // Blue
+        'Hindi': '#E07A5F',       // Terracotta
+        'Bengali': '#81B29A',     // Sage Green
+        'Assamese': '#F2CC8F',    // Yellow/Gold
+        'Tamil': '#B5838D',       // Rose
+        'Telugu': '#6D6875',      // Purple
+        'Gujarati': '#FFB4A2',    // Peach
+        'Marathi': '#3D2C2E',     // Dark Brown
+        'Punjabi': '#8B7E74',     // Taupe
+        'Urdu': '#4A4E69',        // Deep Purple/Grey
+        'Unknown': '#CCCCCC'      // Grey
+    },
+    
+    // Fallback colors for unmapped languages
+    FallbackColors: ['#E8DDD3', '#9A8C98', '#C9ADA7', '#F2E9E4'],
+
+    getLanguageColor(language) {
+        if (this.LanguageColorMap[language]) {
+            return this.LanguageColorMap[language];
+        }
+        // Assign a deterministic fallback color based on string length/chars
+        let hash = 0;
+        for (let i = 0; i < language.length; i++) {
+            hash = language.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return this.FallbackColors[Math.abs(hash) % this.FallbackColors.length];
+    },
+
     init() {
         this.bindSmoothScroll();
         this.bindNavigation();

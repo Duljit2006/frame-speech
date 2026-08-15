@@ -10,6 +10,7 @@ def run_transcription_job(
     model_size: str = "small",
     task: str = "transcribe",
     use_lid_hints: bool = True,
+    region: str = "global",
     is_temp_file: bool = False,
 ):
     """
@@ -19,13 +20,18 @@ def run_transcription_job(
     try:
         job_manager.update_status(job_id, JobStatus.PROCESSING)
 
+        def progress_callback(msg: str):
+            job_manager.update_status(job_id, JobStatus.PROCESSING, progress=msg)
+
         # Run the combined pipeline
         with job_manager.get_global_lock():
             result = state.lid_pipeline.transcribe(
                 input_source,
                 model_size=model_size,
                 task=task,
-                use_lid_hints=use_lid_hints
+                use_lid_hints=use_lid_hints,
+                region=region,
+                progress_callback=progress_callback
             )
 
         # Cleanup uploaded temp file if necessary
@@ -76,12 +82,33 @@ def run_transcription_job(
                 "percentage": round(pct, 1),
             })
 
+        segments = result.get("segments", [])
+        corrected_durations = {}
+        corrected_total = 0
+        for s in segments:
+            dur = s["end"] - s["start"]
+            if dur < 0:
+                dur = 0
+            lang = s["language"]
+            corrected_durations[lang] = corrected_durations.get(lang, 0) + dur
+            corrected_total += dur
+            
+        corrected_summary = []
+        for lang, dur in sorted(corrected_durations.items(), key=lambda x: x[1], reverse=True):
+            pct = (dur / corrected_total) * 100 if corrected_total > 0 else 0
+            corrected_summary.append({
+                "language": lang,
+                "duration_seconds": round(dur, 1),
+                "percentage": round(pct, 1),
+            })
+
         final_result = {
             "success": True,
             "timeline": timeline,
-            "segments": result.get("segments", []),
+            "segments": segments,
             "full_text": result.get("full_text", ""),
             "lid_summary": lid_summary,
+            "corrected_summary": corrected_summary,
             "total_duration": round(total_duration, 1),
             "video_embed_url": embed_url,
             "srt_download": f"/downloads/{srt_filename}",

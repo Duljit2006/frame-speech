@@ -1,10 +1,10 @@
 import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 # Force load .env into os.environ immediately so PyTorch/HF see it before they load
-load_dotenv()
+load_dotenv(override=True)
 
 class Settings(BaseSettings):
     # Audio Processing Settings
@@ -32,9 +32,17 @@ class Settings(BaseSettings):
     LID_CONFIDENCE_THRESHOLD: float = 0.70
     FALLBACK_TO_WHISPER: bool = True
     TARGET_LANGUAGES: List[str] = ["en", "hi", "as"]
+    INDIAN_REGION_LANGUAGES: List[str] = [
+        "en", "hi", "bn", "ta", "te", "mr", "gu", "kn", "ml", "pa", "as", "ur", "ne", "si", "sa"
+    ]
     
     # URL Download Settings
     MAX_URL_DURATION_SECONDS: int = 7200  # 2 hours
+
+    # Gemini API Text Correction Settings
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-3.5-flash"
+
 
     class Config:
         env_file = ".env"

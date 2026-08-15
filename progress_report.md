@@ -14,6 +14,7 @@ The system solves a major problem with modern AI transcription: when speakers mi
 Based on architectural mapping, the system is designed as a **pipeline**. When a user uploads a video or pastes a YouTube link, the audio travels through six distinct AI blocks. 
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph TD
     A[Raw Video / Audio URL] -->|Downloads & Rips| B(Audio Extractor)
     B -->|16kHz Mono WAV| C(Voice Activity Detector)
@@ -23,14 +24,14 @@ graph TD
     F -->|Clean Language Timeline| G(Smart Transcriber)
     G -->|Subtitles| H[Final Outputs: SRT, TXT & Web UI]
     
-    style A fill:#e2e2e2,stroke:#333,stroke-width:2px
-    style H fill:#81B29A,stroke:#333,stroke-width:2px
-    style B fill:#E07A5F,stroke:#333
-    style C fill:#F2CC8F,stroke:#333
-    style D fill:#3D2C2E,stroke:#333,color:#fff
-    style E fill:#8B7E74,stroke:#333,color:#fff
-    style F fill:#E8DDD3,stroke:#333
-    style G fill:#B5838D,stroke:#333,color:#fff
+    style A fill:#e2e2e2,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#E07A5F,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#F2CC8F,stroke:#333,stroke-width:2px,color:#000
+    style D fill:#3D2C2E,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#8B7E74,stroke:#333,stroke-width:2px,color:#fff
+    style F fill:#E8DDD3,stroke:#333,stroke-width:2px,color:#000
+    style G fill:#B5838D,stroke:#333,stroke-width:2px,color:#fff
+    style H fill:#81B29A,stroke:#333,stroke-width:2px,color:#000
 ```
 
 Here is what happens to the audio in each block:

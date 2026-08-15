@@ -15,11 +15,16 @@ router = APIRouter()
 class URLInput(BaseModel):
     url: str
 
+class LIDInput(BaseModel):
+    url: str
+    region: str = "global"
+
 class TranscribeInput(BaseModel):
     url: str
     model_size: str = "small"
     task: str = "transcribe"
     use_lid_hints: bool = True
+    region: str = "global"
 
 async def save_upload_file(upload_file: UploadFile) -> str:
     # Save the uploaded file to a temporary location
@@ -52,19 +57,19 @@ async def extract_audio_file(file: UploadFile = File(...)):
     return {"job_id": job_id}
 
 @router.post("/api/detect-language")
-async def detect_language_url(data: URLInput):
+async def detect_language_url(data: LIDInput):
     """Start a LID job from a URL."""
     job_id = job_manager.create_job("lid")
-    thread = threading.Thread(target=run_lid_job, args=(job_id, data.url, False))
+    thread = threading.Thread(target=run_lid_job, args=(job_id, data.url, data.region, False))
     thread.start()
     return {"job_id": job_id}
 
 @router.post("/api/detect-language/upload")
-async def detect_language_file(file: UploadFile = File(...)):
+async def detect_language_file(file: UploadFile = File(...), region: str = Form("global")):
     """Start a LID job from an uploaded file."""
     temp_path = await save_upload_file(file)
     job_id = job_manager.create_job("lid")
-    thread = threading.Thread(target=run_lid_job, args=(job_id, temp_path, True))
+    thread = threading.Thread(target=run_lid_job, args=(job_id, temp_path, region, True))
     thread.start()
     return {"job_id": job_id}
 
@@ -74,7 +79,7 @@ async def transcribe_url(data: TranscribeInput):
     job_id = job_manager.create_job("transcribe")
     thread = threading.Thread(
         target=run_transcription_job,
-        args=(job_id, data.url, data.model_size, data.task, data.use_lid_hints, False),
+        args=(job_id, data.url, data.model_size, data.task, data.use_lid_hints, data.region, False),
     )
     thread.start()
     return {"job_id": job_id}
@@ -85,13 +90,14 @@ async def transcribe_file(
     model_size: str = Form("small"),
     task: str = Form("transcribe"),
     use_lid_hints: bool = Form(True),
+    region: str = Form("global"),
 ):
     """Start a transcription job from an uploaded file."""
     temp_path = await save_upload_file(file)
     job_id = job_manager.create_job("transcribe")
     thread = threading.Thread(
         target=run_transcription_job,
-        args=(job_id, temp_path, model_size, task, use_lid_hints, True),
+        args=(job_id, temp_path, model_size, task, use_lid_hints, region, True),
     )
     thread.start()
     return {"job_id": job_id}

@@ -28,6 +28,7 @@ class JobManager:
             "id": job_id,
             "type": job_type, # 'extract' or 'lid'
             "status": JobStatus.PENDING,
+            "progress": None,
             "created_at": datetime.now(),
             "result": None,
             "error": None
@@ -37,13 +38,15 @@ class JobManager:
     def get_job(self, job_id: str) -> Optional[Dict[str, Any]]:
         return self._jobs.get(job_id)
         
-    def update_status(self, job_id: str, status: str, result: Any = None, error: str = None):
+    def update_status(self, job_id: str, status: str, result: Any = None, error: str = None, progress: str = None):
         if job_id in self._jobs:
             self._jobs[job_id]["status"] = status
             if result is not None:
                 self._jobs[job_id]["result"] = result
             if error is not None:
                 self._jobs[job_id]["error"] = error
+            if progress is not None:
+                self._jobs[job_id]["progress"] = progress
                 
     def cleanup_old_jobs(self, max_age_minutes: int = 120):
         """Removes jobs older than the specified limit, IF they are finished."""

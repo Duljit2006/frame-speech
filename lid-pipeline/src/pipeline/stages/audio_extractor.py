@@ -67,7 +67,7 @@ class AudioExtractor:
             'quiet': True,
             'no_warnings': True,
             'match_filter': self._duration_filter,
-            'extractor_args': {'youtube': ['player_client=android']},
+            'extractor_args': {'youtube': {'player_client': ['android', 'ios']}},
         }
         
         try:

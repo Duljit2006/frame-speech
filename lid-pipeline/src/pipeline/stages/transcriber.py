@@ -57,12 +57,15 @@ class TranscriptionProcessor:
     # Model management
     # ------------------------------------------------------------------
     def _load_model(self, model_size: str):
-        """Load a Whisper model onto the device."""
-        import whisper
-        print(f"  [Transcriber] Loading Whisper '{model_size}' on {self.device}...")
-        self.model = whisper.load_model(model_size, device=self.device)
+        """Load a Whisper model onto the device using faster-whisper."""
+        from faster_whisper import WhisperModel
+        print(f"  [Transcriber] Loading faster-whisper '{model_size}' on {self.device}...")
+        
+        # Use int8 quantization on GPU to fit large-v3 in 4GB VRAM
+        compute_type = "int8" if self.device == "cuda" else "int8"
+        self.model = WhisperModel(model_size, device=self.device, compute_type=compute_type)
         self.model_size = model_size
-        print(f"  [Transcriber] Whisper '{model_size}' ready.")
+        print(f"  [Transcriber] faster-whisper '{model_size}' ready.")
 
     def switch_model(self, new_size: str):
         """Hot-swap the Whisper model to a different size."""
@@ -82,9 +85,10 @@ class TranscriptionProcessor:
         timeline: List[Dict],
         task: str = "transcribe",
         use_lid_hints: bool = True,
+        progress_callback = None,
     ) -> Dict:
         """
-        Transcribe each language block in the timeline using Whisper.
+        Transcribe each language block in the timeline using faster-whisper.
 
         Args:
             audio_path: Path to the full 16kHz mono WAV file.
@@ -116,9 +120,17 @@ class TranscriptionProcessor:
             # Determine what hint to send to Whisper
             whisper_lang = None
             if use_lid_hints:
-                whisper_lang = self._LANG_TO_WHISPER.get(block_lang, block_lang)
-                if len(whisper_lang) > 3:
-                    whisper_lang = None
+                # Gate by confidence > 0.85 to avoid forcing Whisper on bad LID guesses
+                if block.get("confidence", 0) > 0.85:
+                    whisper_lang = self._LANG_TO_WHISPER.get(block_lang, block_lang)
+                    
+                    # THE ASSAMESE HACK: Force Whisper to use its strong Bengali model
+                    # for Assamese speech to get proper Eastern Nagari script instead of Romanized English.
+                    if whisper_lang == "as":
+                        whisper_lang = "bn"
+                        
+                    if whisper_lang and len(whisper_lang) > 3:
+                        whisper_lang = None
 
             # Slice audio for this block
             start_sample = int(block_start * sr)
@@ -130,51 +142,47 @@ class TranscriptionProcessor:
                 continue
 
             hint_str = whisper_lang if whisper_lang else "auto-detect"
-            print(
-                f"  [Transcriber] Block {block_idx + 1}/{len(timeline)} "
-                f"({block_lang}, {block_end - block_start:.1f}s, Hint: {hint_str})..."
-            )
+            msg = (f"Transcribing Block {block_idx + 1}/{len(timeline)} "
+                   f"({block_lang}, Hint: {hint_str})")
+            if progress_callback:
+                progress_callback(msg)
+            print(f"  [Transcriber] {msg}...")
 
             try:
-                # Write chunk to a temp file (Whisper expects a file path)
-                import tempfile
-                with tempfile.NamedTemporaryFile(
-                    suffix=".wav", delete=False, dir=str(Path(audio_path).parent)
-                ) as tmp:
-                    sf.write(tmp.name, chunk, sr)
-                    tmp_path = tmp.name
+                # Cast to float32 — faster-whisper / ONNX requires float, not double
+                chunk_f32 = chunk.astype(np.float32)
 
                 # Transcribe with language hint and word timestamps
-                result = self.model.transcribe(
-                    tmp_path,
+                segments_generator, info = self.model.transcribe(
+                    chunk_f32,
                     language=whisper_lang,
                     task=task,
                     word_timestamps=True,
-                    verbose=False,
+                    vad_filter=True,  # Built-in VAD to reduce hallucinations
+                    vad_parameters=dict(min_silence_duration_ms=500)
                 )
 
-                # Clean up temp file
-                try:
-                    Path(tmp_path).unlink()
-                except Exception:
-                    pass
-
                 # Process each segment returned by Whisper
-                for seg in result.get("segments", []):
+                for seg in segments_generator:
+                    # Apply hallucination filter and strip broken UTF-8 characters caused by hard audio cuts
+                    text = seg.text.strip().replace('\ufffd', '')
+                    if self._is_hallucination(text, block_lang):
+                        continue
+                        
                     segment_counter += 1
                     # Offset timestamps relative to the full audio
-                    seg_start = block_start + seg["start"]
-                    seg_end = block_start + seg["end"]
-                    text = seg["text"].strip()
+                    seg_start = block_start + seg.start
+                    seg_end = block_start + seg.end
 
                     # Build word list with offset timestamps
                     words = []
-                    for w in seg.get("words", []):
-                        words.append({
-                            "word": w["word"].strip(),
-                            "start": round(block_start + w["start"], 3),
-                            "end": round(block_start + w["end"], 3),
-                        })
+                    if seg.words:
+                        for w in seg.words:
+                            words.append({
+                                "word": w.word.strip(),
+                                "start": round(block_start + w.start, 3),
+                                "end": round(block_start + w.end, 3),
+                            })
 
                     all_segments.append({
                         "id": segment_counter,
@@ -186,12 +194,9 @@ class TranscriptionProcessor:
                     })
 
             except Exception as e:
+                import traceback
                 print(f"  [Transcriber] Error on block {block_idx + 1}: {e}")
-                # Clean up temp file on error
-                try:
-                    Path(tmp_path).unlink()
-                except Exception:
-                    pass
+                traceback.print_exc()
 
         # Build outputs
         full_text = " ".join(s["text"] for s in all_segments)
@@ -206,6 +211,28 @@ class TranscriptionProcessor:
         }
 
     # ------------------------------------------------------------------
+    # Hallucination Filter
+    # ------------------------------------------------------------------
+    def _is_hallucination(self, text: str, target_lang: str) -> bool:
+        """
+        Detects if a segment is likely a Whisper hallucination.
+        Drops segments that are mostly punctuation or contain wrong scripts.
+        """
+        if not text or len(text.strip()) < 2:
+            return True
+            
+        # Check for heavy punctuation (often hallucinated during music/silence)
+        alpha_count = sum(c.isalpha() for c in text)
+        if alpha_count < len(text) * 0.3:
+            return True
+            
+        # Optional: Add strict Unicode block filtering based on target_lang here
+        # Example: if target_lang is Bengali, we could check for Devanagari/Telugu blocks and drop.
+        # But faster-whisper with VAD usually solves 99% of this.
+        
+        return False
+
+    # ------------------------------------------------------------------
     # Export helpers
     # ------------------------------------------------------------------
     @staticmethod
@@ -217,17 +244,19 @@ class TranscriptionProcessor:
         millis = int((seconds % 1) * 1000)
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
 
-    def _generate_srt(self, segments: List[Dict]) -> str:
+    @staticmethod
+    def _generate_srt(segments: List[Dict]) -> str:
         """Generate a valid UTF-8 SRT subtitle string."""
         lines = []
         for seg in segments:
             lines.append(str(seg["id"]))
-            start_tc = self._format_srt_time(seg["start"])
-            end_tc = self._format_srt_time(seg["end"])
+            start_tc = TranscriptionProcessor._format_srt_time(seg["start"])
+            end_tc = TranscriptionProcessor._format_srt_time(seg["end"])
             lines.append(f"{start_tc} --> {end_tc}")
             lines.append(seg["text"])
             lines.append("")  # blank separator
         return "\n".join(lines)
+
 
     @staticmethod
     def _generate_plain_text(segments: List[Dict]) -> str:

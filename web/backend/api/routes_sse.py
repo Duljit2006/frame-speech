@@ -19,6 +19,7 @@ async def job_event_generator(job_id: str):
         job_data = {
             "id": job["id"],
             "status": job["status"],
+            "progress": job.get("progress"),
             "result": job["result"],
             "error": job["error"]
         }

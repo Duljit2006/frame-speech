@@ -24,7 +24,7 @@ class LanguageSmoother:
         self.min_merged_duration = settings.MIN_MERGED_DURATION
         self.family_map = settings.LANGUAGE_FAMILY_MAP
 
-    def process(self, raw_results: List[Dict]) -> List[Dict]:
+    def process(self, raw_results: List[Dict], region: str = "global") -> List[Dict]:
         """
         Args:
             raw_results: List of dicts from LIDProcessor, e.g.:
@@ -39,8 +39,8 @@ class LanguageSmoother:
         if not raw_results:
             return []
 
-        # Step 1: Filter out very short segments and failed/skipped predictions
-        filtered = self._filter_short_and_failed(raw_results)
+        # Step 1: Filter out very short segments, failed predictions, and out-of-region languages
+        filtered = self._filter_short_and_failed(raw_results, region)
         if not filtered:
             return []
         
@@ -60,16 +60,28 @@ class LanguageSmoother:
         
         return merged
 
-    def _filter_short_and_failed(self, results: List[Dict]) -> List[Dict]:
+    def _filter_short_and_failed(self, results: List[Dict], region: str) -> List[Dict]:
         """Remove predictions from segments too short to be reliable, 
-        and skip failed/unknown predictions."""
+        skip failed/unknown predictions, and filter out languages not in the region whitelist."""
         filtered = []
+        
+        whitelist = None
+        if region == "indian":
+            whitelist = set(settings.INDIAN_REGION_LANGUAGES)
+            
         for r in results:
             duration = r['end'] - r['start']
             if duration < self.min_segment_duration:
                 continue
             if r.get('source') in ('skipped', 'failed') or r.get('language') == 'unknown':
                 continue
+                
+            # Filter by region whitelist
+            if whitelist:
+                lang_code = r.get('language', '').split(':')[0].strip() if ':' in r.get('language', '') else r.get('language', '').strip()
+                if lang_code not in whitelist:
+                    continue
+                    
             filtered.append(r)
         return filtered
 

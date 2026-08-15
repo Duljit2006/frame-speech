@@ -465,7 +465,27 @@ a {
 .status-text {
     font-size: 1.25rem;
     font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+.progress-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--sage);
     margin-bottom: 1rem;
+    background: var(--sage-light);
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 99px;
+    animation: pulse-opacity 2s infinite alternate;
+    font-family: var(--font-body);
+}
+#tx-progress-text {
+    color: #b57a17; /* Darker gold for text */
+    background: var(--gold-light);
+}
+@keyframes pulse-opacity {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
 }
 .job-id-text {
     color: var(--secondary-text);
@@ -838,4 +858,160 @@ a {
 /* Gold theme for loader */
 .loader.theme-gold .bar {
     background: var(--gold);
+}
+
+/* ==========================================
+   Progress Stepper Styles
+   ========================================== */
+.progress-stepper {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+    background: rgba(255, 253, 249, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.step {
+    display: flex;
+    gap: 1.5rem;
+    position: relative;
+    padding-bottom: 2rem;
+    transition: var(--transition);
+}
+
+.step:last-child {
+    padding-bottom: 0;
+}
+
+/* Connecting Line */
+.step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    left: 17px;
+    width: 2px;
+    height: calc(100% - 36px);
+    background: var(--border-color);
+    z-index: 0;
+}
+
+.step.completed:not(:last-child)::before {
+    background: var(--primary-text);
+}
+
+.step-indicator {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-color);
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    transition: var(--transition);
+}
+
+.step-icon {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--secondary-text);
+    z-index: 2;
+}
+
+.pulse-ring {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    opacity: 0;
+    z-index: 0;
+}
+
+.step-content {
+    flex: 1;
+    padding-top: 6px;
+}
+
+.step-content h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+    color: var(--secondary-text);
+    transition: var(--transition);
+}
+
+.step-log {
+    font-family: 'Inter', monospace;
+    font-size: 0.85rem;
+    color: var(--secondary-text);
+    opacity: 0.7;
+    margin: 0;
+}
+
+/* State: Pending */
+.step.pending .step-indicator {
+    background: var(--bg-color);
+}
+
+/* State: Active */
+.step.active .step-indicator {
+    border-color: transparent;
+}
+.step.active.theme-sage .step-indicator { background: var(--sage); }
+.step.active.theme-gold .step-indicator { background: var(--gold); }
+.step.active.theme-coral .step-indicator { background: var(--coral); }
+
+.step.active .step-icon {
+    color: #fff;
+}
+
+.step.active .step-content h4 {
+    color: var(--primary-text);
+    font-weight: 700;
+}
+
+.step.active .step-log {
+    color: var(--primary-text);
+    opacity: 1;
+}
+
+.step.active .pulse-ring {
+    animation: pulse-ring-anim 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+.step.active.theme-sage .pulse-ring { border-color: var(--sage); }
+.step.active.theme-gold .pulse-ring { border-color: var(--gold); }
+.step.active.theme-coral .pulse-ring { border-color: var(--coral); }
+
+/* State: Completed */
+.step.completed .step-indicator {
+    background: var(--primary-text);
+    border-color: var(--primary-text);
+}
+.step.completed .step-icon {
+    color: #fff;
+    content: "✓";
+}
+.step.completed .step-content h4 {
+    color: var(--primary-text);
+}
+.step.completed .step-log {
+    color: var(--secondary-text);
+}
+
+@keyframes pulse-ring-anim {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+.status-footer {
+    margin-top: 2rem;
+    text-align: center;
 }

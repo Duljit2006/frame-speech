@@ -11,27 +11,113 @@ document.addEventListener('DOMContentLoaded', () => {
     const jobIdSpan = document.getElementById('lid-job-id');
     const statusText = statusZone.querySelector('.status-text');
     
-    // Simple color palette for chart (can match theme or just be diverse)
     const chartColors = ['#81B29A', '#E07A5F', '#F2CC8F', '#3D2C2E', '#8B7E74', '#E8DDD3'];
+
+    // Track region toggle
+    let selectedRegion = 'indian';
+    const regionBtns = document.querySelectorAll('#workspace-lid #lid-region-group .toggle-btn');
+    regionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            regionBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedRegion = btn.dataset.region;
+        });
+    });
+
+    function resetStepper() {
+        const stepExt = document.getElementById('step-lid-ext');
+        const stepProc = document.getElementById('step-lid-proc');
+        const stepSmooth = document.getElementById('step-lid-smooth');
+        
+        if (stepExt) stepExt.className = 'step active theme-sage';
+        if (stepProc) stepProc.className = 'step pending theme-gold';
+        if (stepSmooth) stepSmooth.className = 'step pending theme-coral';
+        
+        const logExt = document.getElementById('log-lid-ext');
+        const logProc = document.getElementById('log-lid-proc');
+        const logSmooth = document.getElementById('log-lid-smooth');
+        
+        if (logExt) logExt.textContent = 'Waiting to start...';
+        if (logProc) logProc.textContent = 'Waiting to start...';
+        if (logSmooth) logSmooth.textContent = 'Waiting to start...';
+    }
+
+    function updateStepper(progressText) {
+        const stepExt = document.getElementById('step-lid-ext');
+        const stepProc = document.getElementById('step-lid-proc');
+        const stepSmooth = document.getElementById('step-lid-smooth');
+
+        const logExt = document.getElementById('log-lid-ext');
+        const logProc = document.getElementById('log-lid-proc');
+        const logSmooth = document.getElementById('log-lid-smooth');
+
+        function setStepState(step, baseClass, state) {
+            if (step) step.className = `step ${state} ${baseClass}`;
+        }
+
+        if (progressText.includes('Applying Temporal Smoothing')) {
+            setStepState(stepExt, 'theme-sage', 'completed');
+            setStepState(stepProc, 'theme-gold', 'completed');
+            setStepState(stepSmooth, 'theme-coral', 'active');
+            if (logSmooth) logSmooth.textContent = progressText;
+            if (logExt) logExt.textContent = "Completed";
+            if (logProc) logProc.textContent = "Completed";
+        } else if (progressText.includes('Initializing LID') || progressText.includes('LID: Processing')) {
+            setStepState(stepExt, 'theme-sage', 'completed');
+            setStepState(stepProc, 'theme-gold', 'active');
+            setStepState(stepSmooth, 'theme-coral', 'pending');
+            if (logProc) logProc.textContent = progressText;
+            if (logExt) logExt.textContent = "Completed";
+        } else {
+            setStepState(stepExt, 'theme-sage', 'active');
+            setStepState(stepProc, 'theme-gold', 'pending');
+            setStepState(stepSmooth, 'theme-coral', 'pending');
+            if (logExt) logExt.textContent = progressText;
+        }
+    }
+
+    let lidTimerInterval = null;
+    let lidStartTime = null;
 
     function showStatus(jobId) {
         inputZone.classList.add('hidden');
         resultsZone.classList.add('hidden');
         statusZone.classList.remove('hidden');
         jobIdSpan.textContent = jobId;
-        statusText.textContent = "Analyzing audio with AI...";
+        resetStepper();
         
+        if (lidTimerInterval) clearInterval(lidTimerInterval);
+        lidStartTime = Date.now();
+        lidTimerInterval = setInterval(() => {
+            const timerEl = document.getElementById('lid-timer');
+            if (timerEl) {
+                timerEl.textContent = App.formatTime(Math.floor((Date.now() - lidStartTime) / 1000));
+            }
+        }, 1000);
+
         App.subscribeToJob(jobId, 
-            (data) => {},
+            (data) => {
+                if (data.progress) {
+                    updateStepper(data.progress);
+                }
+            },
             (result) => { showResults(result); },
             (err) => {
-                statusText.textContent = `Error: ${err}`;
-                document.querySelector('#workspace-lid .loader').classList.add('hidden');
+                if (lidTimerInterval) clearInterval(lidTimerInterval);
+                const logExt = document.getElementById('log-lid-ext');
+                if (logExt) logExt.textContent = `Error: ${err}`;
+                else alert(`Error: ${err}`);
             }
         );
     }
 
     function showResults(result) {
+        if (lidTimerInterval) {
+            clearInterval(lidTimerInterval);
+            const totalSeconds = Math.floor((Date.now() - lidStartTime) / 1000);
+            document.getElementById('lid-total-time').textContent = App.formatTime(totalSeconds);
+        }
+
         statusZone.classList.add('hidden');
         resultsZone.classList.remove('hidden');
         
@@ -62,7 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const span = document.createElement('span');
             span.className = 'lang-badge';
             span.textContent = block.language;
-            span.style.backgroundColor = 'rgba(0,0,0,0.05)';
+            
+            // Use App.getLanguageColor
+            span.style.backgroundColor = App.getLanguageColor(block.language);
+            span.style.color = '#fff';
             langTd.appendChild(span);
             
             // Confidence
@@ -85,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         legend.innerHTML = '';
         
         summary.forEach((item, index) => {
-            const color = chartColors[index % chartColors.length];
+            const color = App.getLanguageColor(item.language);
             
             // Chart bar
             const segment = document.createElement('div');
@@ -122,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/detect-language', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url })
+                body: JSON.stringify({ url, region: selectedRegion })
             });
             
             const data = await res.json();
@@ -165,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function uploadFile(file) {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('region', selectedRegion);
         
         try {
             const p = dropZone.querySelector('p');
