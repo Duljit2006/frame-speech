@@ -126,8 +126,11 @@ class LIDPipeline:
         print("  --- Offloading LID models from GPU ---")
         try:
             self.lid.sb_model.to("cpu")
-            if self.lid.whisper_model is not None:
-                self.lid.whisper_model.to("cpu")
+            if getattr(self.lid, 'whisper_model', None) is not None:
+                # faster-whisper cannot be offloaded with .to("cpu"). 
+                # We must delete it; it will be lazy-loaded again if needed for the next job.
+                del self.lid.whisper_model
+                self.lid.whisper_model = None
         except Exception as e:
             print(f"  Warning: Failed to offload LID models: {e}")
         import torch
@@ -150,8 +153,8 @@ class LIDPipeline:
         print("  --- Reloading LID models to GPU ---")
         try:
             self.lid.sb_model.to(self.lid.device)
-            if self.lid.whisper_model is not None:
-                self.lid.whisper_model.to(self.lid.device)
+            # The fallback Whisper model doesn't need reloading since we deleted it during offloading.
+            # It will be lazy-loaded on the next job if needed.
         except Exception as e:
             print(f"  Warning: Failed to reload LID models: {e}")
 
