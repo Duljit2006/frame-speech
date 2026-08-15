@@ -33,7 +33,6 @@ When speakers mix multiple languages (e.g., speaking English and Hindi in the sa
 ## 🏗️ Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph TD
     A["🎬 Raw Video / Audio URL"] -->|"Downloads & Rips"| B("1. Audio Extractor")
     B -->|"16kHz Mono WAV"| C("2. Voice Activity Detector")

@@ -14,7 +14,6 @@ The system solves a major problem with modern AI transcription: when speakers mi
 Based on architectural mapping, the system is designed as a **pipeline**. When a user uploads a video or pastes a YouTube link, the audio travels through six distinct AI blocks. 
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph TD
     A[Raw Video / Audio URL] -->|Downloads & Rips| B(Audio Extractor)
     B -->|16kHz Mono WAV| C(Voice Activity Detector)

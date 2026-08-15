@@ -18,7 +18,6 @@ The core challenge it solves: **standard AI transcription models like OpenAI Whi
 The transcription pipeline extends the existing 6-block LID pipeline with two additional heavyweight AI stages — **Whisper Transcription** and **Gemini AI Text Correction** — bringing the total to 8 processing blocks.
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph TD
     A["🎬 Raw Video / Audio URL"] -->|"Downloads & Rips"| B("1. Audio Extractor")
     B -->|"16kHz Mono WAV"| C("2. Voice Activity Detector")
@@ -56,7 +55,6 @@ This is the block that actually *listens* to the audio and converts speech into 
 The key innovation is **Language Hinting**. Instead of letting Whisper blindly guess the language (which fails catastrophically on code-switched audio), the transcriber *tells* Whisper exactly which language to expect for each audio chunk:
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph LR
     A["Smoothed Timeline"] --> B{"Confidence > 85%?"}
     B -->|"Yes"| C["Force Language Hint"]
@@ -116,7 +114,6 @@ This is one of the most creative engineering solutions in the pipeline. Whisper'
 **The Hack:** When the timeline says "Assamese", the transcriber secretly tells Whisper it's Bengali:
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph LR
     A["LID says: Assamese"] --> B["Remap: as → bn"]
     B --> C["Whisper writes Bengali script"]
@@ -150,7 +147,6 @@ Even after language-hinted Whisper transcription, the raw output is far from per
 ### The Problems It Solves
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph TD
     subgraph "❌ Before Gemini Correction"
         direction TB
@@ -196,7 +192,6 @@ Processing a 16-minute video with 100+ segments presents a challenge: Gemini has
 The solution is a **Full-Context Two-Pass** approach:
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph TD
     A["All 100+ Raw Segments"] --> B["Join All Text → Full Context String"]
     A --> C["Split into Batches of 30"]
@@ -269,7 +264,6 @@ If all 4 retries fail, the system gracefully falls back to the raw Whisper outpu
 Running multiple heavyweight AI models on a consumer laptop GPU (NVIDIA RTX 2050, 4GB VRAM) requires careful memory choreography. The pipeline implements a **load-offload-swap** strategy:
 
 ```mermaid
-%%{init: {'theme': 'dark'}}%%
 sequenceDiagram
     participant GPU as GPU VRAM (4GB)
     participant CPU as System RAM
@@ -306,7 +300,6 @@ This strategy ensures that the `large-v3` Whisper model (which requires ~3GB VRA
 When a user submits a transcription job, they see a real-time progress display with three stages:
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontFamily': 'sans-serif' }}}%%
 graph LR
     S1["🟢 Stage 1: Audio & LID"] --> S2["🟡 Stage 2: Whisper Transcription"] --> S3["🔴 Stage 3: Gemini Correction"]
 
@@ -327,7 +320,6 @@ A **live timer** starts counting from `00:00` the moment processing begins and d
 The backend uses **Server-Sent Events** to push real-time progress updates to the browser without the client needing to refresh:
 
 ```mermaid
-%%{init: {'theme': 'dark'}}%%
 sequenceDiagram
     participant Browser
     participant FastAPI
