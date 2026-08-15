@@ -90,7 +90,7 @@ venv\Scripts\activate
 ```
 
 **3. Environment Variables**
-Create a `.env` file in the project root directory and add your Google Gemini API key (required for Model 3 Text Correction):
+Rename the `.env.example` file in the project root directory to `.env` and add your Google Gemini API key (required for Model 3 Text Correction):
 ```ini
 GEMINI_API_KEY="your_api_key_here"
 ```
