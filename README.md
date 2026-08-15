@@ -55,6 +55,20 @@ graph TD
     style I fill:#81B29A,stroke:#333,stroke-width:2px,color:#000
 ```
 
+### 📂 Codebase Mapping
+Each block in the pipeline maps directly to a specific Python module located in `lid-pipeline/src/pipeline/stages/`:
+
+| Pipeline Block | Description | Source File |
+|---|---|---|
+| **1. Audio Extractor** | Downloads and standardizes audio | [`audio_extractor.py`](lid-pipeline/src/pipeline/stages/audio_extractor.py) |
+| **2. Voice Activity Detector** | Removes silence using Silero VAD | [`vad.py`](lid-pipeline/src/pipeline/stages/vad.py) |
+| **3. Segmentation Engine** | Chops audio into 3-second overlapping chunks | [`segmentation.py`](lid-pipeline/src/pipeline/stages/segmentation.py) |
+| **4. Language Detector** | Runs SpeechBrain ECAPA-TDNN predictions | [`lid_processor.py`](lid-pipeline/src/pipeline/stages/lid_processor.py) |
+| **5. Timeline Smoother** | Fixes predictions using median filters | [`smoothing.py`](lid-pipeline/src/pipeline/stages/smoothing.py) |
+| **6. Whisper Transcriber** | Runs `faster-whisper` with language hints | [`transcriber.py`](lid-pipeline/src/pipeline/stages/transcriber.py) |
+| **7. Gemini Text Corrector** | Fixes orthography and sentence fragmentation | [`text_corrector.py`](lid-pipeline/src/pipeline/stages/text_corrector.py) |
+| **Orchestrator** | Glues all the stages together into a single pipeline | [`../orchestrator.py`](lid-pipeline/src/pipeline/orchestrator.py) |
+
 ## 🛠️ Setup & Installation
 
 **Prerequisites:**
