@@ -59,16 +59,8 @@ class LIDProcessor:
         except Exception as e:
             raise LIDInferenceError(f"Failed to load SpeechBrain model: {e}")
 
-        # Load Whisper model (lazy: only if fallback is enabled)
+        # Load Whisper model (lazy: only if fallback is enabled and needed)
         self.whisper_model = None
-        if settings.FALLBACK_TO_WHISPER:
-            try:
-                from faster_whisper import WhisperModel
-                compute_type = "int8" if self.device == "cuda" else "int8"
-                self.whisper_model = WhisperModel("base", device=self.device, compute_type=compute_type)
-                print("  faster-whisper LID fallback model loaded.")
-            except Exception as e:
-                print(f"  Warning: Could not load Whisper fallback model: {e}")
 
     def process(self, audio_path: str, windows: List[Dict[str, float]], region: str = "global", progress_callback=None) -> List[Dict]:
         """
@@ -93,7 +85,9 @@ class LIDProcessor:
             raise LIDInferenceError(f"Failed to read audio file: {e}")
 
         results = []
-        total = len(windows)
+        # Prepare chunks for batching
+        chunks_to_process = []
+        valid_windows = []
         for i, window in enumerate(windows):
             start_sample = int(window['start'] * sr)
             end_sample = int(window['end'] * sr)
@@ -108,84 +102,126 @@ class LIDProcessor:
                     'confidence': 0.0,
                     'source': 'skipped'
                 })
-                continue
+            else:
+                chunks_to_process.append(chunk)
+                valid_windows.append(window)
 
-            # Progress indicator
-            if progress_callback and ((i + 1) % max(1, total // 10) == 0 or i == 0 or i == total - 1):
-                progress_callback(f"LID: Processing segment {i+1}/{total}")
-            elif (i + 1) % 25 == 0 or i == 0 or i == total - 1:
-                print(f"  Processing window {i+1}/{total}...")
+        if not chunks_to_process:
+            return sorted(results, key=lambda x: x['start'])
 
-            result = self._classify_chunk(chunk, sr, window, region=region)
-            results.append(result)
+        # Batch processing loop
+        BATCH_SIZE = 32
+        total_batches = (len(chunks_to_process) + BATCH_SIZE - 1) // BATCH_SIZE
+        
+        for i in range(0, len(chunks_to_process), BATCH_SIZE):
+            batch_chunks = chunks_to_process[i:i + BATCH_SIZE]
+            batch_windows = valid_windows[i:i + BATCH_SIZE]
+            
+            if progress_callback:
+                progress_callback(f"LID: Processing batch {i // BATCH_SIZE + 1}/{total_batches}")
+            else:
+                print(f"  LID: Processing batch {i // BATCH_SIZE + 1}/{total_batches}...")
 
-        return results
+            batch_results = self._classify_batch(batch_chunks, sr, batch_windows, region=region)
+            results.extend(batch_results)
 
-    def _classify_chunk(self, chunk: np.ndarray, sr: int, window: Dict[str, float], region: str = "global") -> Dict:
+        return sorted(results, key=lambda x: x['start'])
+
+    def _classify_batch(self, chunks: List[np.ndarray], sr: int, windows: List[Dict[str, float]], region: str = "global") -> List[Dict]:
         """
-        Classifies a single audio chunk. Uses SpeechBrain first,
-        falls back to Whisper if confidence is below threshold.
+        Classifies a batch of audio chunks using SpeechBrain. 
+        Falls back to Whisper for individual chunks if confidence is below threshold.
         """
-        # --- SpeechBrain Primary ---
+        # Pad chunks to max length in batch
+        max_len = max(len(c) for c in chunks)
+        padded_chunks = []
+        for c in chunks:
+            if len(c) < max_len:
+                padded_chunks.append(np.pad(c, (0, max_len - len(c)), mode='constant'))
+            else:
+                padded_chunks.append(c)
+
+        # Stack into single tensor: [batch_size, time]
+        waveform = torch.from_numpy(np.stack(padded_chunks)).float().to(self.device)
+        results = []
+
         try:
-            # Convert numpy to torch tensor
-            waveform = torch.from_numpy(chunk).float().unsqueeze(0).to(self.device)
-
             # Run SpeechBrain inference
             prediction = self.sb_model.classify_batch(waveform)
-
-            # prediction returns: (out_prob, score, index, text_label)
-            log_posteriors = prediction[0].squeeze(0)  # Shape: [num_languages]
+            # prediction[0] is log_posteriors, shape: [batch_size, 1, num_languages] -> squeeze(1)
+            log_posteriors = prediction[0].squeeze(1)
 
             # Apply Region Whitelisting Mask
             if region == "indian":
                 whitelist = set(settings.INDIAN_REGION_LANGUAGES)
-                # Find valid indices
                 for idx, label in self.sb_model.hparams.label_encoder.ind2lab.items():
                     lang_code = label.split(':')[0].strip() if ':' in label else label.strip()
                     if lang_code not in whitelist:
-                        log_posteriors[idx] = -float('inf')  # Zero out probability
+                        log_posteriors[:, idx] = -float('inf')
 
-            probabilities = torch.exp(log_posteriors)   # Convert to real probabilities (0-1)
+            probabilities = torch.exp(log_posteriors)
+            top_probs, top_idxs = probabilities.max(dim=-1)
 
-            # Get the top prediction
-            top_prob, top_idx = probabilities.max(dim=-1)
-            confidence = top_prob.item()
-            language = self.sb_model.hparams.label_encoder.ind2lab[top_idx.item()]
+            for b in range(len(chunks)):
+                confidence = top_probs[b].item()
+                language = self.sb_model.hparams.label_encoder.ind2lab[top_idxs[b].item()]
 
-            if confidence >= settings.LID_CONFIDENCE_THRESHOLD:
-                return {
-                    'start': window['start'],
-                    'end': window['end'],
-                    'language': language,
-                    'confidence': round(confidence, 4),
-                    'source': 'speechbrain'
-                }
+                if confidence >= settings.LID_CONFIDENCE_THRESHOLD:
+                    results.append({
+                        'start': windows[b]['start'],
+                        'end': windows[b]['end'],
+                        'language': language,
+                        'confidence': round(confidence, 4),
+                        'source': 'speechbrain'
+                    })
+                else:
+                    # Fallback to Whisper for this individual chunk
+                    if settings.FALLBACK_TO_WHISPER:
+                        try:
+                            res = self._whisper_fallback(chunks[b], sr, windows[b], region=region)
+                            results.append(res)
+                        except Exception as e:
+                            print(f"  Whisper fallback error on window {windows[b]['start']}-{windows[b]['end']}: {e}")
+                            results.append({
+                                'start': windows[b]['start'],
+                                'end': windows[b]['end'],
+                                'language': 'unknown',
+                                'confidence': 0.0,
+                                'source': 'failed'
+                            })
+                    else:
+                        results.append({
+                            'start': windows[b]['start'],
+                            'end': windows[b]['end'],
+                            'language': language,
+                            'confidence': round(confidence, 4),
+                            'source': 'speechbrain_low_conf'
+                        })
+            return results
+
         except Exception as e:
-            print(f"  SpeechBrain error on window {window['start']}-{window['end']}: {e}")
-
-        # --- Whisper Fallback ---
-        if self.whisper_model and settings.FALLBACK_TO_WHISPER:
-            try:
-                return self._whisper_fallback(chunk, sr, window, region=region)
-            except Exception as e:
-                import traceback
-                print(f"  Whisper fallback error on window {window['start']}-{window['end']}: {e}")
-                traceback.print_exc()
-
-        # If both fail, return unknown
-        return {
-            'start': window['start'],
-            'end': window['end'],
-            'language': 'unknown',
-            'confidence': 0.0,
-            'source': 'failed'
-        }
+            print(f"  SpeechBrain batch error: {e}")
+            # If SB fails completely on this batch, fallback to Whisper for all chunks
+            for b in range(len(chunks)):
+                if settings.FALLBACK_TO_WHISPER:
+                    results.append(self._whisper_fallback(chunks[b], sr, windows[b], region=region))
+                else:
+                    results.append({'start': windows[b]['start'], 'end': windows[b]['end'], 'language': 'unknown', 'confidence': 0.0, 'source': 'failed'})
+            return results
 
     def _whisper_fallback(self, chunk: np.ndarray, sr: int, window: Dict[str, float], region: str = "global") -> Dict:
         """
         Uses faster-whisper's built-in language detection as a fallback.
         """
+        if self.whisper_model is None and settings.FALLBACK_TO_WHISPER:
+            try:
+                from faster_whisper import WhisperModel
+                compute_type = "int8" if self.device == "cuda" else "int8"
+                self.whisper_model = WhisperModel("base", device=self.device, compute_type=compute_type)
+                print("  faster-whisper LID fallback model loaded lazily.")
+            except Exception as e:
+                print(f"  Warning: Could not load Whisper fallback model: {e}")
+
         if not self.whisper_model:
             return {'start': window['start'], 'end': window['end'], 'language': 'unknown', 'confidence': 0.0, 'source': 'failed'}
 

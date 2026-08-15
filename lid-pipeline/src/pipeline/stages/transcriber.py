@@ -112,7 +112,21 @@ class TranscriptionProcessor:
         all_segments = []
         segment_counter = 0
 
-        for block_idx, block in enumerate(timeline):
+        # Optimization 3: Merge consecutive same-language blocks to reduce transcriber overhead
+        merged_timeline = []
+        for block in timeline:
+            if not merged_timeline:
+                merged_timeline.append(block.copy())
+            else:
+                last_block = merged_timeline[-1]
+                if last_block["language"] == block["language"]:
+                    # Merge blocks
+                    last_block["end"] = block["end"]
+                    last_block["confidence"] = min(last_block.get("confidence", 1.0), block.get("confidence", 1.0))
+                else:
+                    merged_timeline.append(block.copy())
+                    
+        for block_idx, block in enumerate(merged_timeline):
             block_start = block["start"]
             block_end = block["end"]
             block_lang = block["language"]
@@ -142,7 +156,7 @@ class TranscriptionProcessor:
                 continue
 
             hint_str = whisper_lang if whisper_lang else "auto-detect"
-            msg = (f"Transcribing Block {block_idx + 1}/{len(timeline)} "
+            msg = (f"Transcribing Block {block_idx + 1}/{len(merged_timeline)} "
                    f"({block_lang}, Hint: {hint_str})")
             if progress_callback:
                 progress_callback(msg)
@@ -158,8 +172,7 @@ class TranscriptionProcessor:
                     language=whisper_lang,
                     task=task,
                     word_timestamps=True,
-                    vad_filter=True,  # Built-in VAD to reduce hallucinations
-                    vad_parameters=dict(min_silence_duration_ms=500)
+                    vad_filter=False  # Optimization 2: Removed redundant VAD since audio is already VAD-stripped
                 )
 
                 # Process each segment returned by Whisper
