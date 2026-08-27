@@ -386,19 +386,34 @@
 
     /* Pipeline Architecture Grid */
     .pipeline-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
       gap: 1.25rem;
       margin-bottom: 4rem;
     }
 
     .stage-card {
+      flex: 1 1 300px;
+      max-width: 350px;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 1.5rem;
       transition: all 0.2s ease;
       position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stage-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+      opacity: 0.8;
     }
 
     .stage-card:hover {
@@ -598,6 +613,11 @@
       .hero h1 { font-size: 2.5rem; }
       .video-showcase-grid { grid-template-columns: 1fr; }
       .nav-links { display: none; }
+      .stage-connector {
+        width: 100%;
+        transform: rotate(90deg);
+        height: 2rem;
+      }
     }
   </style>
 </head>
@@ -738,12 +758,16 @@
         <div class="tech-detail">Sample Rate: 16000Hz | Channels: 1</div>
       </div>
 
+      <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
+
       <div class="stage-card">
         <div class="stage-number">Stage 02</div>
         <h4><i class="fa-solid fa-microphone-slash" style="color: #F2CC8F;"></i> Silero VAD</h4>
         <p>Evaluates <code>float32</code> audio tensors via a lightweight PyTorch neural VAD. Identifies active speech indices against a strict probability threshold to strip compute-heavy silence.</p>
         <div class="tech-detail">Confidence Threshold: &ge; 0.50</div>
       </div>
+
+      <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 03</div>
@@ -752,12 +776,16 @@
         <div class="tech-detail">Window: 3.0s | Stride: 1.0s | Overlap: 66%</div>
       </div>
 
+      <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
+
       <div class="stage-card">
         <div class="stage-number">Stage 04</div>
         <h4><i class="fa-solid fa-language" style="color: #8B7E74;"></i> SpeechBrain LID</h4>
         <p>Executes vectorized inference on 107-class ECAPA-TDNN embeddings. Applies an <code>-inf</code> log-softmax mask to filter out non-Indian language classes prior to activation.</p>
         <div class="tech-detail">Batch Size: 32 | Fallback Threshold: &lt; 0.70</div>
       </div>
+
+      <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 05</div>
@@ -766,12 +794,16 @@
         <div class="tech-detail">Time Bin Resolution: 0.5s</div>
       </div>
 
+      <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
+
       <div class="stage-card">
         <div class="stage-number">Stage 06</div>
         <h4><i class="fa-solid fa-pen-nib" style="color: #457B9D;"></i> faster-whisper</h4>
         <p>Executes CTranslate2 int8 quantized transcription. Disables internal redundant VAD. Applies gated language hinting and drops segments where <code>alpha_count &lt; length * 0.3</code>.</p>
         <div class="tech-detail">Hint Gate: &ge; 0.85 | Quantization: int8</div>
       </div>
+
+      <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 07</div>
