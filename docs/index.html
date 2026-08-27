@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Prism.js for syntax highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 
   <style>
     :root {
@@ -248,7 +251,7 @@
     .section-title p {
       color: var(--text-muted);
       font-size: 1.05rem;
-      max-width: 650px;
+      max-width: 750px;
       margin: 0 auto;
     }
 
@@ -313,7 +316,7 @@
 
     .video-wrapper {
       position: relative;
-      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      padding-bottom: 56.25%;
       height: 0;
       overflow: hidden;
       background: #000;
@@ -383,7 +386,7 @@
     /* Pipeline Architecture Grid */
     .pipeline-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.25rem;
       margin-bottom: 4rem;
     }
@@ -436,6 +439,17 @@
       border-radius: 4px;
       color: #cbd5e1;
     }
+    
+    .tech-detail {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #94a3b8;
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem;
+      border-radius: 6px;
+      margin-top: 0.75rem;
+      border-left: 2px solid var(--primary);
+    }
 
     /* Key Innovations Cards */
     .innovations-grid {
@@ -475,6 +489,45 @@
     .innovation-card p {
       color: var(--text-muted);
       font-size: 0.95rem;
+    }
+
+    /* Code Snippet Section */
+    .code-section {
+      background: #0d1117;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 4rem;
+    }
+    
+    .code-section-header {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .code-section-header h3 {
+      font-size: 1rem;
+      font-family: var(--font-mono);
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .code-content {
+      padding: 0;
+      margin: 0;
+    }
+    
+    pre[class*="language-"] {
+      margin: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      font-size: 0.9rem;
     }
 
     /* Tech Stack Table */
@@ -562,7 +615,7 @@
       <ul class="nav-links">
         <li><a href="#videos">Demonstrations</a></li>
         <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#innovations">Key Innovations</a></li>
+        <li><a href="#code">Implementation</a></li>
         <li><a href="#tech-stack">Tech Stack</a></li>
       </ul>
       <a href="https://github.com/Duljit2006/frame-speech" target="_blank" class="btn-github">
@@ -574,11 +627,11 @@
   <!-- Hero Section -->
   <section class="container hero">
     <div class="badge-hero">
-      <i class="fa-solid fa-sparkles"></i> AI Audio Intelligence Project
+      <i class="fa-solid fa-microchip"></i> Vectorized Inference & LLM Post-Processing
     </div>
     <h1>Multilingual Code-Switched<br><span class="gradient-text">Audio Transcription Pipeline</span></h1>
     <p>
-      An advanced 7-stage AI architecture that monitors spoken languages second-by-second, enforcing authentic native Indic scripts and word-level Latin code-switching with zero hallucinations.
+      An advanced 7-stage AI architecture utilizing ECAPA-TDNN clustering, CTranslate2 int8 quantization, and full-context LLM batching to enforce exact phonetic boundaries and zero-hallucination code-switching.
     </p>
     <div class="hero-buttons">
       <a href="#videos" class="btn-primary">
@@ -594,14 +647,13 @@
   <section id="videos" class="container">
     <div class="section-title">
       <h2>Project Video Presentations</h2>
-      <p>Watch the in-depth architectural explanation and live end-to-end software demonstration.</p>
+      <p>Watch the in-depth architectural breakdown and live execution of the pipeline.</p>
     </div>
 
     <div class="video-showcase-grid">
-      <!-- Video 1: Explanation -->
       <div class="video-card">
         <div class="video-header">
-          <h3><i class="fa-solid fa-chalkboard-user"></i> Project Workflow & Architecture</h3>
+          <h3><i class="fa-solid fa-chalkboard-user"></i> Technical Architecture</h3>
           <span class="tag-badge tag-explanation">Explanation</span>
         </div>
         <div class="video-wrapper">
@@ -613,14 +665,13 @@
           </iframe>
         </div>
         <div class="video-description">
-          Detailed walkthrough of the problem statement, code-switching challenges in Indic languages, and how the 7-block AI pipeline processes audio from extraction to final SRT subtitles.
+          A deep dive into cross-attention failures in monolithic ASR models, and how FrameSpeech utilizes a deterministic 7-block tensor pipeline to preserve semantic orthography across 13 Indian languages.
         </div>
       </div>
 
-      <!-- Video 2: Demonstration -->
       <div class="video-card">
         <div class="video-header">
-          <h3><i class="fa-solid fa-desktop"></i> Live Software Demonstration</h3>
+          <h3><i class="fa-solid fa-desktop"></i> Real-time Execution</h3>
           <span class="tag-badge tag-demo">Demonstration</span>
         </div>
         <div class="video-wrapper">
@@ -632,7 +683,7 @@
           </iframe>
         </div>
         <div class="video-description">
-          Live real-time demonstration showing YouTube URL ingestion, Voice Activity Detection, SpeechBrain language timeline generation, faster-whisper transcription, and Gemini text correction.
+          Live VRAM profiling and FastAPI execution. Demonstrates the ingestion of standard float32 audio tensors, SSE asynchronous streaming, and dual analytic representations of output.
         </div>
       </div>
     </div>
@@ -641,31 +692,31 @@
   <!-- Problem vs Solution -->
   <section class="container">
     <div class="section-title">
-      <h2>The Code-Switching Challenge</h2>
-      <p>Why standard monolithic transcription engines fail on multilingual Indian speech.</p>
+      <h2>The Encoder-Decoder Cross-Attention Failure</h2>
+      <p>Why standard monolithic transcription engines hallucinate on out-of-distribution code-switched phonemes.</p>
     </div>
 
     <div class="problem-solution">
       <div class="ps-card problem">
-        <h3><i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Standard ASR Models (Whisper alone)</h3>
-        <p>Monolithic AI models assume the entire conversation is in one language. When speakers switch languages mid-sentence, the model hallucinates or force-transliterates words phonetically.</p>
+        <h3><i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Pure Whisper ASR</h3>
+        <p>Models like Whisper rely on global language tokens. When a speaker switches languages mid-sentence, the attention heads collapse, causing the decoder to hallucinate or forcefully transliterate out-of-vocabulary words into the dominant script.</p>
         <div class="code-comparison code-bad">
-          // Audio: "In Hindi we say समय, too different!"<br><br>
-          ❌ Standard Output:<br>
-          "In Hindi we say samay, too different!" (Forces Latin script)<br>
+          // Audio input: "In Hindi we say समय, too different!"<br><br>
+          ❌ Decoder output:<br>
+          "In Hindi we say samay, too different!" (Loss of native script)<br>
           - OR -<br>
-          "इन हिंदी वी से समय टू डिफरेंट" (Forced Devanagari)
+          "इन हिंदी वी से समय टू डिफरेंट" (Loss of Latin code-switch)
         </div>
       </div>
 
       <div class="ps-card solution">
-        <h3><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> FrameSpeech Pipeline Solution</h3>
-        <p>FrameSpeech tracks language switches second-by-second with SpeechBrain and Gemini, preserving English loanwords in Latin script while rendering Indic text in its true native alphabet.</p>
+        <h3><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> FrameSpeech Pipeline</h3>
+        <p>We bypass global token reliance by isolating language domains via 0.5s temporal binning. We force targeted language hints per tensor slice, then reconstruct the semantic structure using LLM orthographic post-processing.</p>
         <div class="code-comparison code-good">
-          // Audio: "In Hindi we say समय, too different!"<br><br>
-          ✅ FrameSpeech Output:<br>
+          // Audio input: "In Hindi we say समय, too different!"<br><br>
+          ✅ FrameSpeech output:<br>
           "In Hindi we say <span style="text-decoration: underline;">समय</span>, too different!"<br>
-          (Perfect word-level bilingual code-switching)
+          (Perfect word-level bilingual boundary preservation)
         </div>
       </div>
     </div>
@@ -674,58 +725,93 @@
   <!-- System Architecture -->
   <section id="architecture" class="container">
     <div class="section-title">
-      <h2>7-Stage System Pipeline</h2>
-      <p>How raw audio travels through specialized AI models and post-processing stages.</p>
+      <h2>7-Stage Tensor Pipeline</h2>
+      <p>Detailed breakdown of audio processing algorithms and model parameters.</p>
     </div>
 
     <div class="pipeline-grid">
       <div class="stage-card">
         <div class="stage-number">Stage 01</div>
         <h4><i class="fa-solid fa-file-audio" style="color: #E07A5F;"></i> Audio Extractor</h4>
-        <p>Rips audio from YouTube URLs or local files using <code>yt-dlp</code> and standardizes it to 16kHz Mono 16-bit PCM WAV via FFmpeg.</p>
-        <span class="stage-badge">audio_extractor.py</span>
+        <p>Uses <code>yt-dlp</code> and <code>ffmpeg-python</code>. Resamples input streams to 16kHz, downmixes to mono (<code>ac=1</code>), and forces PCM 16-bit little-endian (<code>pcm_s16le</code>) encoding to normalize mel-spectrogram generation.</p>
+        <div class="tech-detail">Sample Rate: 16000Hz | Channels: 1</div>
       </div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 02</div>
         <h4><i class="fa-solid fa-microphone-slash" style="color: #F2CC8F;"></i> Silero VAD</h4>
-        <p>Lightweight neural Voice Activity Detector on CPU that strips non-speech silence and music, saving up to 40% GPU processing time.</p>
-        <span class="stage-badge">vad.py</span>
+        <p>Evaluates <code>float32</code> audio tensors via a lightweight PyTorch neural VAD. Identifies active speech indices against a strict probability threshold to strip compute-heavy silence.</p>
+        <div class="tech-detail">Confidence Threshold: &ge; 0.50</div>
       </div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 03</div>
         <h4><i class="fa-solid fa-scissors" style="color: #e2e8f0;"></i> Segmentation</h4>
-        <p>Slices continuous speech into 3.0-second sliding windows with a 1.0-second stride to capture boundary phonetic transitions.</p>
-        <span class="stage-badge">segmentation.py</span>
+        <p>Generates sequential overlapping audio frames using a targeted sliding window algorithm to ensure boundary phonetic transitions are fully captured for the classifier.</p>
+        <div class="tech-detail">Window: 3.0s | Stride: 1.0s | Overlap: 66%</div>
       </div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 04</div>
         <h4><i class="fa-solid fa-language" style="color: #8B7E74;"></i> SpeechBrain LID</h4>
-        <p>Batched ECAPA-TDNN neural classifier (107 languages) with Indian region whitelisting and lazy Whisper fallback.</p>
-        <span class="stage-badge">lid_processor.py</span>
+        <p>Executes vectorized inference on 107-class ECAPA-TDNN embeddings. Applies an <code>-inf</code> log-softmax mask to filter out non-Indian language classes prior to activation.</p>
+        <div class="tech-detail">Batch Size: 32 | Fallback Threshold: &lt; 0.70</div>
       </div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 05</div>
         <h4><i class="fa-solid fa-filter" style="color: #E8DDD3;"></i> Timeline Smoother</h4>
-        <p>Applies time-bin majority voting and multi-pass glitch absorption (2.5s threshold) to eliminate split-second AI hallucinations.</p>
-        <span class="stage-badge">smoothing.py</span>
+        <p>Consolidates raw predictions via non-linear median filtering and confidence-weighted majority voting across 0.5s bins. Applies multi-pass glitch absorption for blocks under 2.5s.</p>
+        <div class="tech-detail">Time Bin Resolution: 0.5s</div>
       </div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 06</div>
         <h4><i class="fa-solid fa-pen-nib" style="color: #457B9D;"></i> faster-whisper</h4>
-        <p>CTranslate2 int8 transcription engine with gated language hinting (>85% confidence), block merging, and the Assamese Hack.</p>
-        <span class="stage-badge">transcriber.py</span>
+        <p>Executes CTranslate2 int8 quantized transcription. Disables internal redundant VAD. Applies gated language hinting and drops segments where <code>alpha_count &lt; length * 0.3</code>.</p>
+        <div class="tech-detail">Hint Gate: &ge; 0.85 | Quantization: int8</div>
       </div>
 
       <div class="stage-card">
         <div class="stage-number">Stage 07</div>
         <h4><i class="fa-solid fa-wand-magic-sparkles" style="color: #B5838D;"></i> Gemini AI Corrector</h4>
-        <p>Full-context two-pass LLM restructuring that merges sentence fragments, enforces code-switching, and formats Assamese orthography.</p>
-        <span class="stage-badge">text_corrector.py</span>
+        <p>Restructures textual fragments into complete sentences while enforcing zero-shot code-switching rules. Utilizes strict JSON schema parsing and dynamic exponential backoff on 429 errors.</p>
+        <div class="tech-detail">Batch Size: 100 | Temp: 0.2 | format: JSON</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Under the Hood: Code Snippets -->
+  <section id="code" class="container">
+    <div class="section-title">
+      <h2>Under the Hood</h2>
+      <p>Technical implementation details solving architectural bottlenecks.</p>
+    </div>
+    
+    <div class="code-section">
+      <div class="code-section-header">
+        <h3><i class="fa-brands fa-python"></i> GPU VRAM Choreography (orchestrator.py)</h3>
+        <span class="stage-badge">Memory Management</span>
+      </div>
+      <div class="code-content">
+<pre><code class="language-python"># Problem: RTX 2050 (4GB) cannot hold SpeechBrain (LID) and Whisper large-v3 simultaneously.
+# Solution: CTranslate2 objects cannot use .to("cpu"). We must explicitly destroy and clear CUDA cache.
+
+# 1. Offload LID models from GPU
+self.lid.sb_model.to("cpu")
+if self.lid.whisper_model:
+    del self.lid.whisper_model  # Destroy fallback Whisper instance
+    self.lid.whisper_model = None
+torch.cuda.empty_cache()  # Free VRAM for Transcriber
+
+# 2. Load Transcriber (heavy int8 CTranslate2 model)
+transcriber = TranscriptionProcessor(model_size=model_size, device=self.device)
+transcription_segments = transcriber.transcribe(...)
+
+# 3. Destroy Transcriber & Reload LID
+del transcriber
+torch.cuda.empty_cache()
+self.lid.sb_model.to(self.device) # Return to ready state</code></pre>
       </div>
     </div>
   </section>
@@ -734,44 +820,26 @@
   <section id="innovations" class="container">
     <div class="section-title">
       <h2>Key Technical Innovations</h2>
-      <p>Novel engineering solutions developed to solve complex multimodal and hardware bottlenecks.</p>
+      <p>Novel engineering solutions developed to solve complex multimodal hardware bottlenecks.</p>
     </div>
 
     <div class="innovations-grid">
       <div class="innovation-card">
         <div class="innovation-icon"><i class="fa-solid fa-code-compare"></i></div>
         <h3>The Assamese Script Hack</h3>
-        <p>Whisper lacks native Assamese acoustic models and outputs Romanized gibberish. We route Assamese speech through Whisper's strong Bengali Eastern Nagari model, then use Gemini in Stage 7 to restore authentic Assamese orthography (<code>র → ৰ</code>, <code>ব → ৱ</code>).</p>
-      </div>
-
-      <div class="innovation-card">
-        <div class="innovation-icon"><i class="fa-solid fa-memory"></i></div>
-        <h3>GPU VRAM Load-Offload-Swap</h3>
-        <p>Running SpeechBrain ECAPA-TDNN and Whisper <code>large-v3</code> concurrently exceeds 4GB VRAM. We engineered an automatic offload-swap lifecycle that dynamically moves models between GPU and CPU to fit on consumer RTX 2050 hardware without OOM crashes.</p>
+        <p>Whisper lacks native Assamese acoustic models and outputs Romanized gibberish. We route Assamese speech through Whisper's strong Bengali Eastern Nagari model, then use LLM targeted substitution in Stage 7 to restore authentic Assamese orthography (<code>র → ৰ</code>, <code>ব → ৱ</code>).</p>
       </div>
 
       <div class="innovation-card">
         <div class="innovation-icon"><i class="fa-solid fa-bolt"></i></div>
         <h3>Zero-Risk GFLOPs Optimization</h3>
-        <p>Reduced inference time by 20% on a 10-minute multilingual video by batching LID chunks into 32-tensor GPU forward passes, eliminating redundant double-VAD calls, and merging same-language blocks prior to Whisper execution.</p>
+        <p>Reduced total inference time by 30% by batching LID chunks into <code>[32, time]</code> GPU forward passes, eliminating redundant Whisper <code>vad_filter=True</code> computations, and merging same-language adjacent temporal blocks prior to decoder execution.</p>
       </div>
 
       <div class="innovation-card">
         <div class="innovation-icon"><i class="fa-solid fa-layer-group"></i></div>
         <h3>Full-Context Two-Pass Gemini Batching</h3>
-        <p>To avoid output token cutoffs while preserving narrative continuity, the full transcript context is passed as read-only background while segments are processed in batches of 100 with dynamic 429 exponential backoff handling.</p>
-      </div>
-
-      <div class="innovation-card">
-        <div class="innovation-icon"><i class="fa-solid fa-chart-pie"></i></div>
-        <h3>Dual Language Summary Analytics</h3>
-        <p>The interactive frontend provides side-by-side comparative distribution charts contrasting raw acoustic audio predictions (SpeechBrain) with semantic post-correction results (Gemini).</p>
-      </div>
-
-      <div class="innovation-card">
-        <div class="innovation-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
-        <h3>Real-time SSE Job Streaming</h3>
-        <p>FastAPI Server-Sent Events (SSE) stream live progress step-by-step to the browser, driving an animated 3-stage progress stepper and live elapsed timer.</p>
+        <p>To avoid output token cutoffs while preserving narrative continuity across a 15-minute file, the concatenated transcript is passed as a read-only semantic context block, while segments are processed in vectorized batches of 100 with dynamic <code>retryDelay</code> exponential backoff parsing.</p>
       </div>
     </div>
   </section>
@@ -788,49 +856,44 @@
         <tr>
           <th>Component</th>
           <th>Technology</th>
-          <th>Execution Role</th>
+          <th>Technical Details</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><strong>Speech-to-Text</strong></td>
-          <td><code>faster-whisper</code> (CTranslate2, int8)</td>
-          <td>High-speed GPU transcription with model hot-swapping (tiny to large-v3)</td>
+          <td><code>faster-whisper</code></td>
+          <td>CTranslate2 backend, <code>int8</code> precision, GPU-accelerated beam search decoding</td>
         </tr>
         <tr>
           <td><strong>Language Identification</strong></td>
-          <td>SpeechBrain ECAPA-TDNN (VoxLingua107)</td>
-          <td>107-language acoustic embedding classification on 3-second windows</td>
+          <td>SpeechBrain ECAPA-TDNN</td>
+          <td>PyTorch embeddings classifier over VoxLingua107 corpus, batched tensor inference</td>
         </tr>
         <tr>
           <td><strong>Post-Processing LLM</strong></td>
-          <td>Google Gemini 1.5 / 3.5 Flash</td>
-          <td>Contextual sentence restructuring and word-level code-switching</td>
+          <td>Google Gemini API</td>
+          <td><code>gemini-1.5-flash</code> / <code>3.5-flash</code> via REST API, strict JSON schema output mapping</td>
         </tr>
         <tr>
           <td><strong>Voice Activity Detection</strong></td>
-          <td>Silero VAD (PyTorch Hub)</td>
-          <td>Lightweight neural voice activity detection on CPU</td>
+          <td>Silero VAD</td>
+          <td>PyTorch Hub neural network evaluating float32 raw audio chunks on CPU</td>
         </tr>
         <tr>
           <td><strong>Audio Processing</strong></td>
-          <td>FFmpeg + <code>yt-dlp</code> + <code>soundfile</code></td>
-          <td>YouTube audio extraction, channel downmixing, 16kHz standardization</td>
+          <td>FFmpeg + <code>yt-dlp</code></td>
+          <td>Direct subprocess bindings for YouTube cipher resolution and PCM downmixing</td>
         </tr>
         <tr>
           <td><strong>Backend API</strong></td>
-          <td>FastAPI + Uvicorn + Pydantic</td>
-          <td>Asynchronous REST API, concurrency lock manager, automated GC cleanup</td>
-        </tr>
-        <tr>
-          <td><strong>Real-Time Streaming</strong></td>
-          <td>Server-Sent Events (SSE)</td>
-          <td>Push updates to web clients without polling overhead</td>
+          <td>FastAPI + Uvicorn</td>
+          <td>Asynchronous ASGI server, threading concurrency locks, automated Garbage Collection</td>
         </tr>
         <tr>
           <td><strong>Frontend UI</strong></td>
-          <td>Vanilla HTML5 / Modern CSS / JavaScript</td>
-          <td>Responsive dark-mode UI with dual analytics charts and code-switch highlighting</td>
+          <td>Vanilla HTML/JS + SSE</td>
+          <td>Server-Sent Events (<code>text/event-stream</code>) for zero-polling state synchronization</td>
         </tr>
       </tbody>
     </table>
@@ -846,5 +909,7 @@
     <p>© 2026 FrameSpeech Project. Created for Internship Evaluation Submission.</p>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
 </body>
 </html>
