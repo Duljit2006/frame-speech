@@ -16,19 +16,20 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 
   <style>
+    /* Color Palette matching graphify-out theme */
     :root {
-      --bg-dark: #090d16;
-      --bg-card: rgba(18, 26, 43, 0.7);
-      --bg-card-hover: rgba(26, 37, 60, 0.85);
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-glow: rgba(99, 102, 241, 0.3);
-      --primary: #6366f1;
-      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-      --accent-cyan: #06b6d4;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+      --bg-dark: #0f0f1a;
+      --bg-card: rgba(26, 26, 46, 0.85); /* #1a1a2e with transparency */
+      --bg-card-hover: rgba(42, 42, 78, 0.95); /* #2a2a4e */
+      --border-color: #2a2a4e;
+      --border-glow: #3a3a5e;
+      --primary: #4E79A7;
+      --primary-gradient: linear-gradient(135deg, #4E79A7 0%, #B07AA1 50%, #E15759 100%);
+      --accent-cyan: #76B7B2;
+      --accent-emerald: #59A14F;
+      --accent-amber: #F28E2B;
+      --text-main: #e0e0e0;
+      --text-muted: #aaaaaa;
       --font-sans: 'Plus Jakarta Sans', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
@@ -58,9 +59,9 @@
       z-index: -1;
       opacity: 0.25;
     }
-    .glow-1 { top: -100px; left: -100px; background: #6366f1; }
-    .glow-2 { top: 40%; right: -150px; background: #ec4899; }
-    .glow-3 { bottom: -100px; left: 30%; background: #06b6d4; }
+    .glow-1 { top: -100px; left: -100px; background: #4E79A7; }
+    .glow-2 { top: 40%; right: -150px; background: #B07AA1; }
+    .glow-3 { bottom: -100px; left: 30%; background: #59A14F; }
 
     /* Header & Navigation */
     header {
@@ -156,8 +157,8 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.4rem 1rem;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(78, 121, 167, 0.15);
+      border: 1px solid rgba(78, 121, 167, 0.3);
       border-radius: 9999px;
       color: #c7d2fe;
       font-size: 0.85rem;
@@ -207,13 +208,13 @@
       text-decoration: none;
       font-weight: 700;
       font-size: 1rem;
-      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 10px 25px -5px rgba(78, 121, 167, 0.4);
       transition: all 0.2s ease;
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.6);
+      box-shadow: 0 15px 30px -5px rgba(78, 121, 167, 0.6);
     }
 
     .btn-secondary {
@@ -303,9 +304,9 @@
     }
 
     .tag-explanation {
-      background: rgba(99, 102, 241, 0.2);
-      color: #818cf8;
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(78, 121, 167, 0.2);
+      color: #4E79A7;
+      border: 1px solid rgba(78, 121, 167, 0.3);
     }
 
     .tag-demo {
@@ -471,14 +472,14 @@
       width: 48px;
       height: 48px;
       border-radius: 12px;
-      background: rgba(99, 102, 241, 0.15);
+      background: rgba(78, 121, 167, 0.15);
       color: #a855f7;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.3rem;
       margin-bottom: 1.25rem;
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      border: 1px solid rgba(78, 121, 167, 0.3);
     }
 
     .innovation-card h3 {
