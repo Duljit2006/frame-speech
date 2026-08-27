@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FrameSpeech — AI Audio Intelligence & Code-Switched Transcription</title>
+  <meta name="description" content="AI-powered pipeline for second-by-second multilingual detection and code-switched audio transcription." />
+  
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(18, 26, 43, 0.7);
+      --bg-card-hover: rgba(26, 37, 60, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.3);
+      --primary: #6366f1;
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Background Glows */
+    .glow-bg {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.25;
+    }
+    .glow-1 { top: -100px; left: -100px; background: #6366f1; }
+    .glow-2 { top: 40%; right: -150px; background: #ec4899; }
+    .glow-3 { bottom: -100px; left: 30%; background: #06b6d4; }
+
+    /* Header & Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(16px);
+      background: rgba(9, 13, 22, 0.8);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 100;
+      padding: 1rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.3rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    .logo i {
+      -webkit-text-fill-color: initial;
+      color: #a855f7;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.1rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      border-radius: 9999px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-github:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem 3rem;
+    }
+
+    .badge-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 9999px;
+      color: #c7d2fe;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .gradient-text {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.8rem;
+      background: var(--primary-gradient);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.8rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Section Title */
+    .section-title {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-title h2 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* Video Showcase Section */
+    .video-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .video-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .video-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+    }
+
+    .video-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .video-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .tag-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .tag-explanation {
+      background: rgba(99, 102, 241, 0.2);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .tag-demo {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-description {
+      padding: 1.25rem 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Problem vs Solution */
+    .problem-solution {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .ps-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .ps-card.problem {
+      border-left: 4px solid #ef4444;
+    }
+
+    .ps-card.solution {
+      border-left: 4px solid #10b981;
+    }
+
+    .ps-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .code-comparison {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .code-bad { color: #f87171; }
+    .code-good { color: #34d399; }
+
+    /* Pipeline Architecture Grid */
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 4rem;
+    }
+
+    .stage-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .stage-card:hover {
+      border-color: var(--border-glow);
+      background: var(--bg-card-hover);
+      transform: translateY(-3px);
+    }
+
+    .stage-number {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .stage-card h4 {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stage-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .stage-badge {
+      display: inline-block;
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      color: #cbd5e1;
+    }
+
+    /* Key Innovations Cards */
+    .innovations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .innovation-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .innovation-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #a855f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .innovation-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .innovation-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Tech Stack Table */
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 4rem;
+    }
+
+    .tech-table th, .tech-table td {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .tech-table th {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tech-table td {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .tech-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      background: rgba(9, 13, 22, 0.9);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+      color: var(--text-main);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5rem; }
+      .video-showcase-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-bg glow-1"></div>
+  <div class="glow-bg glow-2"></div>
+  <div class="glow-bg glow-3"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <i class="fa-solid fa-wave-square"></i> FrameSpeech
+      </a>
+      <ul class="nav-links">
+        <li><a href="#videos">Demonstrations</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#innovations">Key Innovations</a></li>
+        <li><a href="#tech-stack">Tech Stack</a></li>
+      </ul>
+      <a href="https://github.com/Duljit2006/frame-speech" target="_blank" class="btn-github">
+        <i class="fa-brands fa-github"></i> GitHub Repo
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="container hero">
+    <div class="badge-hero">
+      <i class="fa-solid fa-sparkles"></i> AI Audio Intelligence Project
+    </div>
+    <h1>Multilingual Code-Switched<br><span class="gradient-text">Audio Transcription Pipeline</span></h1>
+    <p>
+      An advanced 7-stage AI architecture that monitors spoken languages second-by-second, enforcing authentic native Indic scripts and word-level Latin code-switching with zero hallucinations.
+    </p>
+    <div class="hero-buttons">
+      <a href="#videos" class="btn-primary">
+        <i class="fa-solid fa-play"></i> Watch Project Videos
+      </a>
+      <a href="https://github.com/Duljit2006/frame-speech" target="_blank" class="btn-secondary">
+        <i class="fa-brands fa-github"></i> View Source Code
+      </a>
+    </div>
+  </section>
+
+  <!-- Video Showcase Section -->
+  <section id="videos" class="container">
+    <div class="section-title">
+      <h2>Project Video Presentations</h2>
+      <p>Watch the in-depth architectural explanation and live end-to-end software demonstration.</p>
+    </div>
+
+    <div class="video-showcase-grid">
+      <!-- Video 1: Explanation -->
+      <div class="video-card">
+        <div class="video-header">
+          <h3><i class="fa-solid fa-chalkboard-user"></i> Project Workflow & Architecture</h3>
+          <span class="tag-badge tag-explanation">Explanation</span>
+        </div>
+        <div class="video-wrapper">
+          <iframe 
+            src="https://www.youtube-nocookie.com/embed/HUFYWic-URo" 
+            title="FrameSpeech Project Workflow Explanation" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="video-description">
+          Detailed walkthrough of the problem statement, code-switching challenges in Indic languages, and how the 7-block AI pipeline processes audio from extraction to final SRT subtitles.
+        </div>
+      </div>
+
+      <!-- Video 2: Demonstration -->
+      <div class="video-card">
+        <div class="video-header">
+          <h3><i class="fa-solid fa-desktop"></i> Live Software Demonstration</h3>
+          <span class="tag-badge tag-demo">Demonstration</span>
+        </div>
+        <div class="video-wrapper">
+          <iframe 
+            src="https://www.youtube-nocookie.com/embed/3la8wLFBO-Q" 
+            title="FrameSpeech Live Software Demonstration" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="video-description">
+          Live real-time demonstration showing YouTube URL ingestion, Voice Activity Detection, SpeechBrain language timeline generation, faster-whisper transcription, and Gemini text correction.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem vs Solution -->
+  <section class="container">
+    <div class="section-title">
+      <h2>The Code-Switching Challenge</h2>
+      <p>Why standard monolithic transcription engines fail on multilingual Indian speech.</p>
+    </div>
+
+    <div class="problem-solution">
+      <div class="ps-card problem">
+        <h3><i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Standard ASR Models (Whisper alone)</h3>
+        <p>Monolithic AI models assume the entire conversation is in one language. When speakers switch languages mid-sentence, the model hallucinates or force-transliterates words phonetically.</p>
+        <div class="code-comparison code-bad">
+          // Audio: "In Hindi we say समय, too different!"<br><br>
+          ❌ Standard Output:<br>
+          "In Hindi we say samay, too different!" (Forces Latin script)<br>
+          - OR -<br>
+          "इन हिंदी वी से समय टू डिफरेंट" (Forced Devanagari)
+        </div>
+      </div>
+
+      <div class="ps-card solution">
+        <h3><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> FrameSpeech Pipeline Solution</h3>
+        <p>FrameSpeech tracks language switches second-by-second with SpeechBrain and Gemini, preserving English loanwords in Latin script while rendering Indic text in its true native alphabet.</p>
+        <div class="code-comparison code-good">
+          // Audio: "In Hindi we say समय, too different!"<br><br>
+          ✅ FrameSpeech Output:<br>
+          "In Hindi we say <span style="text-decoration: underline;">समय</span>, too different!"<br>
+          (Perfect word-level bilingual code-switching)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- System Architecture -->
+  <section id="architecture" class="container">
+    <div class="section-title">
+      <h2>7-Stage System Pipeline</h2>
+      <p>How raw audio travels through specialized AI models and post-processing stages.</p>
+    </div>
+
+    <div class="pipeline-grid">
+      <div class="stage-card">
+        <div class="stage-number">Stage 01</div>
+        <h4><i class="fa-solid fa-file-audio" style="color: #E07A5F;"></i> Audio Extractor</h4>
+        <p>Rips audio from YouTube URLs or local files using <code>yt-dlp</code> and standardizes it to 16kHz Mono 16-bit PCM WAV via FFmpeg.</p>
+        <span class="stage-badge">audio_extractor.py</span>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-number">Stage 02</div>
+        <h4><i class="fa-solid fa-microphone-slash" style="color: #F2CC8F;"></i> Silero VAD</h4>
+        <p>Lightweight neural Voice Activity Detector on CPU that strips non-speech silence and music, saving up to 40% GPU processing time.</p>
+        <span class="stage-badge">vad.py</span>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-number">Stage 03</div>
+        <h4><i class="fa-solid fa-scissors" style="color: #e2e8f0;"></i> Segmentation</h4>
+        <p>Slices continuous speech into 3.0-second sliding windows with a 1.0-second stride to capture boundary phonetic transitions.</p>
+        <span class="stage-badge">segmentation.py</span>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-number">Stage 04</div>
+        <h4><i class="fa-solid fa-language" style="color: #8B7E74;"></i> SpeechBrain LID</h4>
+        <p>Batched ECAPA-TDNN neural classifier (107 languages) with Indian region whitelisting and lazy Whisper fallback.</p>
+        <span class="stage-badge">lid_processor.py</span>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-number">Stage 05</div>
+        <h4><i class="fa-solid fa-filter" style="color: #E8DDD3;"></i> Timeline Smoother</h4>
+        <p>Applies time-bin majority voting and multi-pass glitch absorption (2.5s threshold) to eliminate split-second AI hallucinations.</p>
+        <span class="stage-badge">smoothing.py</span>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-number">Stage 06</div>
+        <h4><i class="fa-solid fa-pen-nib" style="color: #457B9D;"></i> faster-whisper</h4>
+        <p>CTranslate2 int8 transcription engine with gated language hinting (>85% confidence), block merging, and the Assamese Hack.</p>
+        <span class="stage-badge">transcriber.py</span>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage-number">Stage 07</div>
+        <h4><i class="fa-solid fa-wand-magic-sparkles" style="color: #B5838D;"></i> Gemini AI Corrector</h4>
+        <p>Full-context two-pass LLM restructuring that merges sentence fragments, enforces code-switching, and formats Assamese orthography.</p>
+        <span class="stage-badge">text_corrector.py</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Innovations -->
+  <section id="innovations" class="container">
+    <div class="section-title">
+      <h2>Key Technical Innovations</h2>
+      <p>Novel engineering solutions developed to solve complex multimodal and hardware bottlenecks.</p>
+    </div>
+
+    <div class="innovations-grid">
+      <div class="innovation-card">
+        <div class="innovation-icon"><i class="fa-solid fa-code-compare"></i></div>
+        <h3>The Assamese Script Hack</h3>
+        <p>Whisper lacks native Assamese acoustic models and outputs Romanized gibberish. We route Assamese speech through Whisper's strong Bengali Eastern Nagari model, then use Gemini in Stage 7 to restore authentic Assamese orthography (<code>র → ৰ</code>, <code>ব → ৱ</code>).</p>
+      </div>
+
+      <div class="innovation-card">
+        <div class="innovation-icon"><i class="fa-solid fa-memory"></i></div>
+        <h3>GPU VRAM Load-Offload-Swap</h3>
+        <p>Running SpeechBrain ECAPA-TDNN and Whisper <code>large-v3</code> concurrently exceeds 4GB VRAM. We engineered an automatic offload-swap lifecycle that dynamically moves models between GPU and CPU to fit on consumer RTX 2050 hardware without OOM crashes.</p>
+      </div>
+
+      <div class="innovation-card">
+        <div class="innovation-icon"><i class="fa-solid fa-bolt"></i></div>
+        <h3>Zero-Risk GFLOPs Optimization</h3>
+        <p>Reduced inference time by 20% on a 10-minute multilingual video by batching LID chunks into 32-tensor GPU forward passes, eliminating redundant double-VAD calls, and merging same-language blocks prior to Whisper execution.</p>
+      </div>
+
+      <div class="innovation-card">
+        <div class="innovation-icon"><i class="fa-solid fa-layer-group"></i></div>
+        <h3>Full-Context Two-Pass Gemini Batching</h3>
+        <p>To avoid output token cutoffs while preserving narrative continuity, the full transcript context is passed as read-only background while segments are processed in batches of 100 with dynamic 429 exponential backoff handling.</p>
+      </div>
+
+      <div class="innovation-card">
+        <div class="innovation-icon"><i class="fa-solid fa-chart-pie"></i></div>
+        <h3>Dual Language Summary Analytics</h3>
+        <p>The interactive frontend provides side-by-side comparative distribution charts contrasting raw acoustic audio predictions (SpeechBrain) with semantic post-correction results (Gemini).</p>
+      </div>
+
+      <div class="innovation-card">
+        <div class="innovation-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+        <h3>Real-time SSE Job Streaming</h3>
+        <p>FastAPI Server-Sent Events (SSE) stream live progress step-by-step to the browser, driving an animated 3-stage progress stepper and live elapsed timer.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack Table -->
+  <section id="tech-stack" class="container">
+    <div class="section-title">
+      <h2>Technology Stack & Models</h2>
+      <p>Modern machine learning frameworks, audio DSP tools, and full-stack web technologies.</p>
+    </div>
+
+    <table class="tech-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Technology</th>
+          <th>Execution Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Speech-to-Text</strong></td>
+          <td><code>faster-whisper</code> (CTranslate2, int8)</td>
+          <td>High-speed GPU transcription with model hot-swapping (tiny to large-v3)</td>
+        </tr>
+        <tr>
+          <td><strong>Language Identification</strong></td>
+          <td>SpeechBrain ECAPA-TDNN (VoxLingua107)</td>
+          <td>107-language acoustic embedding classification on 3-second windows</td>
+        </tr>
+        <tr>
+          <td><strong>Post-Processing LLM</strong></td>
+          <td>Google Gemini 1.5 / 3.5 Flash</td>
+          <td>Contextual sentence restructuring and word-level code-switching</td>
+        </tr>
+        <tr>
+          <td><strong>Voice Activity Detection</strong></td>
+          <td>Silero VAD (PyTorch Hub)</td>
+          <td>Lightweight neural voice activity detection on CPU</td>
+        </tr>
+        <tr>
+          <td><strong>Audio Processing</strong></td>
+          <td>FFmpeg + <code>yt-dlp</code> + <code>soundfile</code></td>
+          <td>YouTube audio extraction, channel downmixing, 16kHz standardization</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>FastAPI + Uvicorn + Pydantic</td>
+          <td>Asynchronous REST API, concurrency lock manager, automated GC cleanup</td>
+        </tr>
+        <tr>
+          <td><strong>Real-Time Streaming</strong></td>
+          <td>Server-Sent Events (SSE)</td>
+          <td>Push updates to web clients without polling overhead</td>
+        </tr>
+        <tr>
+          <td><strong>Frontend UI</strong></td>
+          <td>Vanilla HTML5 / Modern CSS / JavaScript</td>
+          <td>Responsive dark-mode UI with dual analytics charts and code-switch highlighting</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://github.com/Duljit2006/frame-speech" target="_blank"><i class="fa-brands fa-github"></i> GitHub Repository</a>
+      <a href="https://youtu.be/HUFYWic-URo" target="_blank"><i class="fa-brands fa-youtube"></i> Explanation Video</a>
+      <a href="https://youtu.be/3la8wLFBO-Q" target="_blank"><i class="fa-brands fa-youtube"></i> Demo Video</a>
+    </div>
+    <p>© 2026 FrameSpeech Project. Created for Internship Evaluation Submission.</p>
+  </footer>
+
+</body>
+</html>
