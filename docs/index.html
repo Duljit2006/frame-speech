@@ -416,6 +416,34 @@
       opacity: 0.8;
     }
 
+    
+    .stage-card {
+      cursor: pointer;
+      justify-content: center;
+    }
+    
+    .stage-card h4 {
+      margin-bottom: 0;
+      transition: margin 0.3s ease;
+    }
+    
+    .stage-card:hover h4 {
+      margin-bottom: 0.5rem;
+    }
+
+    .stage-details {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stage-card:hover .stage-details {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 0.5rem;
+    }
+
     .stage-card:hover {
       border-color: var(--border-glow);
       background: var(--bg-card-hover);
@@ -754,8 +782,10 @@
       <div class="stage-card">
         <div class="stage-number">Stage 01</div>
         <h4><i class="fa-solid fa-file-audio" style="color: #E07A5F;"></i> Audio Extractor</h4>
-        <p>Uses <code>yt-dlp</code> and <code>ffmpeg-python</code>. Resamples input streams to 16kHz, downmixes to mono (<code>ac=1</code>), and forces PCM 16-bit little-endian (<code>pcm_s16le</code>) encoding to normalize mel-spectrogram generation.</p>
-        <div class="tech-detail">Sample Rate: 16000Hz | Channels: 1</div>
+        <div class="stage-details">
+          <p>Uses <code>yt-dlp</code> and <code>ffmpeg-python</code>. Resamples input streams to 16kHz, downmixes to mono (<code>ac=1</code>), and forces PCM 16-bit little-endian (<code>pcm_s16le</code>) encoding to normalize mel-spectrogram generation.</p>
+          <div class="tech-detail">Sample Rate: 16000Hz | Channels: 1</div>
+        </div>
       </div>
 
       <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
@@ -763,8 +793,10 @@
       <div class="stage-card">
         <div class="stage-number">Stage 02</div>
         <h4><i class="fa-solid fa-microphone-slash" style="color: #F2CC8F;"></i> Silero VAD</h4>
-        <p>Evaluates <code>float32</code> audio tensors via a lightweight PyTorch neural VAD. Identifies active speech indices against a strict probability threshold to strip compute-heavy silence.</p>
-        <div class="tech-detail">Confidence Threshold: &ge; 0.50</div>
+        <div class="stage-details">
+          <p>Evaluates <code>float32</code> audio tensors via a lightweight PyTorch neural VAD. Identifies active speech indices against a strict probability threshold to strip compute-heavy silence.</p>
+          <div class="tech-detail">Confidence Threshold: &ge; 0.50</div>
+        </div>
       </div>
 
       <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
@@ -772,8 +804,10 @@
       <div class="stage-card">
         <div class="stage-number">Stage 03</div>
         <h4><i class="fa-solid fa-scissors" style="color: #e2e8f0;"></i> Segmentation</h4>
-        <p>Generates sequential overlapping audio frames using a targeted sliding window algorithm to ensure boundary phonetic transitions are fully captured for the classifier.</p>
-        <div class="tech-detail">Window: 3.0s | Stride: 1.0s | Overlap: 66%</div>
+        <div class="stage-details">
+          <p>Generates sequential overlapping audio frames using a targeted sliding window algorithm to ensure boundary phonetic transitions are fully captured for the classifier.</p>
+          <div class="tech-detail">Window: 3.0s | Stride: 1.0s | Overlap: 66%</div>
+        </div>
       </div>
 
       <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
@@ -781,8 +815,10 @@
       <div class="stage-card">
         <div class="stage-number">Stage 04</div>
         <h4><i class="fa-solid fa-language" style="color: #8B7E74;"></i> SpeechBrain LID</h4>
-        <p>Executes vectorized inference on 107-class ECAPA-TDNN embeddings. Applies an <code>-inf</code> log-softmax mask to filter out non-Indian language classes prior to activation.</p>
-        <div class="tech-detail">Batch Size: 32 | Fallback Threshold: &lt; 0.70</div>
+        <div class="stage-details">
+          <p>Executes vectorized inference on 107-class ECAPA-TDNN embeddings. Applies an <code>-inf</code> log-softmax mask to filter out non-Indian language classes prior to activation.</p>
+          <div class="tech-detail">Batch Size: 32 | Fallback Threshold: &lt; 0.70</div>
+        </div>
       </div>
 
       <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
@@ -790,8 +826,10 @@
       <div class="stage-card">
         <div class="stage-number">Stage 05</div>
         <h4><i class="fa-solid fa-filter" style="color: #E8DDD3;"></i> Timeline Smoother</h4>
-        <p>Consolidates raw predictions via non-linear median filtering and confidence-weighted majority voting across 0.5s bins. Applies multi-pass glitch absorption for blocks under 2.5s.</p>
-        <div class="tech-detail">Time Bin Resolution: 0.5s</div>
+        <div class="stage-details">
+          <p>Consolidates raw predictions via non-linear median filtering and confidence-weighted majority voting across 0.5s bins. Applies multi-pass glitch absorption for blocks under 2.5s.</p>
+          <div class="tech-detail">Time Bin Resolution: 0.5s</div>
+        </div>
       </div>
 
       <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
@@ -799,8 +837,10 @@
       <div class="stage-card">
         <div class="stage-number">Stage 06</div>
         <h4><i class="fa-solid fa-pen-nib" style="color: #457B9D;"></i> faster-whisper</h4>
-        <p>Executes CTranslate2 int8 quantized transcription. Disables internal redundant VAD. Applies gated language hinting and drops segments where <code>alpha_count &lt; length * 0.3</code>.</p>
-        <div class="tech-detail">Hint Gate: &ge; 0.85 | Quantization: int8</div>
+        <div class="stage-details">
+          <p>Executes CTranslate2 int8 quantized transcription. Disables internal redundant VAD. Applies gated language hinting and drops segments where <code>alpha_count &lt; length * 0.3</code>.</p>
+          <div class="tech-detail">Hint Gate: &ge; 0.85 | Quantization: int8</div>
+        </div>
       </div>
 
       <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
@@ -808,8 +848,10 @@
       <div class="stage-card">
         <div class="stage-number">Stage 07</div>
         <h4><i class="fa-solid fa-wand-magic-sparkles" style="color: #B5838D;"></i> Gemini AI Corrector</h4>
-        <p>Restructures textual fragments into complete sentences while enforcing zero-shot code-switching rules. Utilizes strict JSON schema parsing and dynamic exponential backoff on 429 errors.</p>
-        <div class="tech-detail">Batch Size: 100 | Temp: 0.2 | format: JSON</div>
+        <div class="stage-details">
+          <p>Restructures textual fragments into complete sentences while enforcing zero-shot code-switching rules. Utilizes strict JSON schema parsing and dynamic exponential backoff on 429 errors.</p>
+          <div class="tech-detail">Batch Size: 100 | Temp: 0.2 | format: JSON</div>
+        </div>
       </div>
     </div>
   </section>
