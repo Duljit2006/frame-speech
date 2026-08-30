@@ -824,13 +824,13 @@ transcriber = TranscriptionProcessor(...)</code></pre>
         <div class="code-comparison">
           <div style="display: flex; gap: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
             <div style="flex:1;">
-              <strong>Raw Whisper Output:</strong><br>
-              <span class="code-bad">আমি অসমীয়া কওঁ।</span> <em>(Bengali script hallucination)</em>
-            </div>
-            <div style="flex:1;">
-              <strong>After Gemini Correction:</strong><br>
-              <span class="code-good">আমি অসমীয়া কওঁ। -> আমি অসমীয়া কওঁ। (Corrected characters)</span><br>
-              <span class="code-good">ৰ, ৱ applied.</span>
+              <strong>Raw Whisper Output:
+          <br>
+          <span style="color: #E07A5F;">মোর ঘর গুয়াহাটীত।</span> (Bengali script hallucination)
+          <br><br>
+          After Gemini Correction:
+          <br>
+          <span style="color: #81B29A;">মোৰ ঘৰ গুৱাহাটীত।</span> (Assamese script enforced: ৰ, ৱ).</span>
             </div>
           </div>
           <code>{"text": "আমি অসমীয়া কওঁ।", "language": "as", "error_flag": false}</code>
