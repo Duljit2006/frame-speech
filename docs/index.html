@@ -494,6 +494,13 @@
       font-weight: 600;
       font-size: 0.85rem;
       font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+    .vram-fill.small-bar::after {
+      right: auto;
+      left: 100%;
+      margin-left: 12px;
+      color: var(--text-main);
     }
     .vram-steps {
       display: flex;
@@ -773,7 +780,7 @@ transcriber = TranscriptionProcessor(...)</code></pre>
           <span id="vram-usage-text" style="color: var(--primary); font-family: var(--font-mono);">0 MB / 4096 MB</span>
         </h4>
         <div class="vram-bar-container">
-          <div class="vram-fill" id="vram-bar" data-label="Idle" style="width: 2%;"></div>
+          <div class="vram-fill small-bar" id="vram-bar" data-label="Idle" style="width: 3%;"></div>
         </div>
         <div class="vram-steps">
           <button class="vram-step-btn active-step" onclick="updateVram(1, this)">1. System Idle<br><small>100MB</small></button>
@@ -873,6 +880,7 @@ transcriber = TranscriptionProcessor(...)</code></pre>
       const bar = document.getElementById('vram-bar');
       const text = document.getElementById('vram-usage-text');
       
+      if(step === 1 || step === 3 || step === 5) { bar.classList.add('small-bar'); } else { bar.classList.remove('small-bar'); }
       if(step === 1) { bar.style.width = '3%'; bar.dataset.label = 'OS/Idle'; text.innerText = '120 MB / 4096 MB'; }
       if(step === 2) { bar.style.width = '35%'; bar.dataset.label = 'SpeechBrain LID'; text.innerText = '1450 MB / 4096 MB'; }
       if(step === 3) { bar.style.width = '5%'; bar.dataset.label = 'Cache Cleared'; text.innerText = '180 MB / 4096 MB'; }
