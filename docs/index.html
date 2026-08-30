@@ -343,6 +343,29 @@
       min-height: 120px;
     }
     
+    
+    .stage-card h4 {
+      margin-bottom: 0;
+      transition: margin 0.3s ease;
+    }
+    
+    .stage-card:hover h4 {
+      margin-bottom: 0.5rem;
+    }
+
+    .stage-details {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stage-card:hover .stage-details {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 0.5rem;
+    }
+
     .stage-connector {
       display: flex;
       align-items: center;
@@ -377,7 +400,30 @@
       }
       .stage-card { width: 100%; }
       .row-connector { transform: rotate(90deg); margin: 0.5rem 0; }
-      .stage-connector { transform: rotate(90deg); height: 2rem; width: 100%; }
+      
+    .stage-card h4 {
+      margin-bottom: 0;
+      transition: margin 0.3s ease;
+    }
+    
+    .stage-card:hover h4 {
+      margin-bottom: 0.5rem;
+    }
+
+    .stage-details {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stage-card:hover .stage-details {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 0.5rem;
+    }
+
+    .stage-connector { transform: rotate(90deg); height: 2rem; width: 100%; }
     }
 
 
