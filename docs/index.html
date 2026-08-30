@@ -307,44 +307,48 @@
     .code-good { color: #81B29A; }
 
     
-    /* Staggered Pipeline Layout */
-    .pipeline-staggered {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      max-width: none; overflow-x: auto; padding-bottom: 2rem;
-      margin: 0 0 4rem 0;
-      align-items: flex-start;
-    }
-    .stagger-row {
-      display: flex;
-      align-items: stretch;
+    /* Staggered Pipeline Grid Layout */
+    .pipeline-grid-staircase {
+      display: grid;
+      grid-template-columns: auto 30px auto 30px auto 30px auto 30px;
       gap: 1.25rem;
-      position: relative;
+      margin: 0 0 4rem 0;
+      justify-content: center;
     }
-    .row-1 { margin-left: 0; }
-    .row-2 { margin-left: 390px; }
-    .row-3 { margin-left: 780px; }
-    .row-4 { margin-left: 1170px; }
     
     .stage-card {
-      width: 320px;
-      flex-shrink: 0;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 1.5rem;
-      transition: all 0.2s ease;
-      position: relative;
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      cursor: pointer;
       justify-content: center;
-      min-height: 120px;
+      overflow: hidden;
+      min-height: 90px;
+    }
+    
+    .stage-card.collapsed {
+      width: 230px;
     }
     
     
+    .pipeline-grid-staircase:has(.stage-card:hover) .stage-card:not(:hover) {
+      width: 190px;
+    }
+    
+    .pipeline-grid-staircase:has(.stage-card:hover) .stage-card:not(:hover) .stage-details {
+      opacity: 0;
+    }
+
+    .stage-card:hover {
+      width: 380px;
+    }
+    
     .stage-card h4 {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       margin-bottom: 0;
       transition: margin 0.3s ease;
     }
@@ -352,80 +356,50 @@
     .stage-card:hover h4 {
       margin-bottom: 0.5rem;
     }
-
+    
     .stage-details {
+      width: 340px; /* Keep text wrap fixed during animation */
       max-height: 0;
       opacity: 0;
-      overflow: hidden;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
+    
     .stage-card:hover .stage-details {
       max-height: 400px;
       opacity: 1;
       margin-top: 0.5rem;
     }
 
-    .stage-connector {
+    .stage-connector, .row-connector {
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--primary);
-      font-size: 1.5rem;
-      opacity: 0.8;
-      width: 30px;
-    }
-    
-    .row-connector {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary);
-      font-size: 1.5rem;
-      opacity: 0.8;
-      width: 30px;
-      /* Rotate to point down-right */
-      transform: rotate(45deg);
+      font-size: 1.2rem;
+      opacity: 0.6;
     }
 
-    @media (max-width: 950px) {
-      .pipeline-staggered {
+    @media (max-width: 1050px) {
+      .pipeline-grid-staircase {
+        display: flex;
+        flex-direction: column;
         align-items: center;
       }
-      .stagger-row {
-        flex-direction: column;
-        margin-left: 0 !important;
-        width: 100%;
-        max-width: 350px;
-      }
-      .stage-card { width: 100%; }
-      .row-connector { transform: rotate(90deg); margin: 0.5rem 0; }
+      .pipeline-grid-staircase > div { grid-column: auto !important; grid-row: auto !important; }
+      .stage-card.collapsed { width: 100%; max-width: 380px; }
       
-    .stage-card h4 {
-      margin-bottom: 0;
-      transition: margin 0.3s ease;
+    .pipeline-grid-staircase:has(.stage-card:hover) .stage-card:not(:hover) {
+      width: 190px;
     }
     
-    .stage-card:hover h4 {
-      margin-bottom: 0.5rem;
-    }
-
-    .stage-details {
-      max-height: 0;
+    .pipeline-grid-staircase:has(.stage-card:hover) .stage-card:not(:hover) .stage-details {
       opacity: 0;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .stage-card:hover .stage-details {
-      max-height: 400px;
-      opacity: 1;
-      margin-top: 0.5rem;
+    .stage-card:hover { width: 100%; max-width: 380px; }
+      .stage-details { width: 100%; }
+      .row-connector, .stage-connector { transform: rotate(90deg) !important; height: 2rem; width: 100%; }
     }
-
-    .stage-connector { transform: rotate(90deg); height: 2rem; width: 100%; }
-    }
-
 
     /* Interactive Tabs System */
     .tabs-nav {
@@ -447,7 +421,7 @@
       padding: 0.5rem 1rem;
       border-radius: 8px;
       transition: all 0.2s ease;
-      white-space: nowrap;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .tab-btn:hover {
       background: rgba(224, 122, 95, 0.05);
@@ -655,10 +629,10 @@
       <p>Detailed breakdown of audio processing algorithms and model parameters.</p>
     </div>
 
-    <div class="pipeline-staggered">
+    <div class="pipeline-grid-staircase">
       <!-- Row 1 -->
-      <div class="stagger-row row-1">
-        <div class="stage-card">
+      <div style="grid-column: 1; grid-row: 1;">
+        <div class="stage-card collapsed">
 <div class="stage-number">Stage 01</div>
         <h4><i class="fa-solid fa-file-audio" style="color: #E07A5F;"></i> Audio Extractor</h4>
         <div class="stage-details">
@@ -666,8 +640,9 @@
           <div class="tech-detail">Sample Rate: 16000Hz | Channels: 1</div>
         </div>
       </div>
-        <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
-        <div class="stage-card">
+      <div class="stage-connector" style="grid-column: 2; grid-row: 1;"><i class="fa-solid fa-arrow-right"></i></div>
+      <div style="grid-column: 3; grid-row: 1;">
+        <div class="stage-card collapsed">
 <div class="stage-number">Stage 02</div>
         <h4><i class="fa-solid fa-microphone-slash" style="color: #F2CC8F;"></i> Silero VAD</h4>
         <div class="stage-details">
@@ -675,12 +650,11 @@
           <div class="tech-detail">Confidence Threshold: &ge; 0.50</div>
         </div>
       </div>
-        <div class="row-connector"><i class="fa-solid fa-arrow-right"></i></div>
-      </div>
-      
+      <div class="row-connector" style="grid-column: 4; grid-row: 1;"><i class="fa-solid fa-arrow-right" style="transform: rotate(45deg);"></i></div>
+
       <!-- Row 2 -->
-      <div class="stagger-row row-2">
-        <div class="stage-card">
+      <div style="grid-column: 3; grid-row: 2;">
+        <div class="stage-card collapsed">
 <div class="stage-number">Stage 03</div>
         <h4><i class="fa-solid fa-scissors" style="color: #e2e8f0;"></i> Segmentation</h4>
         <div class="stage-details">
@@ -688,8 +662,9 @@
           <div class="tech-detail">Window: 3.0s | Stride: 1.0s | Overlap: 66%</div>
         </div>
       </div>
-        <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
-        <div class="stage-card">
+      <div class="stage-connector" style="grid-column: 4; grid-row: 2;"><i class="fa-solid fa-arrow-right"></i></div>
+      <div style="grid-column: 5; grid-row: 2;">
+        <div class="stage-card collapsed">
 <div class="stage-number">Stage 04</div>
         <h4><i class="fa-solid fa-language" style="color: #8B7E74;"></i> SpeechBrain LID</h4>
         <div class="stage-details">
@@ -697,12 +672,11 @@
           <div class="tech-detail">Batch Size: 32 | Fallback Threshold: &lt; 0.70</div>
         </div>
       </div>
-        <div class="row-connector"><i class="fa-solid fa-arrow-right"></i></div>
-      </div>
+      <div class="row-connector" style="grid-column: 6; grid-row: 2;"><i class="fa-solid fa-arrow-right" style="transform: rotate(45deg);"></i></div>
 
       <!-- Row 3 -->
-      <div class="stagger-row row-3">
-        <div class="stage-card">
+      <div style="grid-column: 5; grid-row: 3;">
+        <div class="stage-card collapsed">
 <div class="stage-number">Stage 05</div>
         <h4><i class="fa-solid fa-filter" style="color: #E8DDD3;"></i> Timeline Smoother</h4>
         <div class="stage-details">
@@ -710,8 +684,9 @@
           <div class="tech-detail">Time Bin Resolution: 0.5s</div>
         </div>
       </div>
-        <div class="stage-connector"><i class="fa-solid fa-arrow-right"></i></div>
-        <div class="stage-card">
+      <div class="stage-connector" style="grid-column: 6; grid-row: 3;"><i class="fa-solid fa-arrow-right"></i></div>
+      <div style="grid-column: 7; grid-row: 3;">
+        <div class="stage-card collapsed">
 <div class="stage-number">Stage 06</div>
         <h4><i class="fa-solid fa-pen-nib" style="color: #457B9D;"></i> faster-whisper</h4>
         <div class="stage-details">
@@ -719,12 +694,11 @@
           <div class="tech-detail">Hint Gate: &ge; 0.85 | Quantization: int8</div>
         </div>
       </div>
-        <div class="row-connector"><i class="fa-solid fa-arrow-right"></i></div>
-      </div>
+      <div class="row-connector" style="grid-column: 8; grid-row: 3;"><i class="fa-solid fa-arrow-right" style="transform: rotate(45deg);"></i></div>
 
-      <!-- Row 4 (Output) -->
-      <div class="stagger-row row-4">
-        <div class="stage-card">
+      <!-- Row 4 -->
+      <div style="grid-column: 7; grid-row: 4;">
+        <div class="stage-card collapsed">
 <div class="stage-number">Stage 07</div>
         <h4><i class="fa-solid fa-wand-magic-sparkles" style="color: #B5838D;"></i> Gemini AI Corrector</h4>
         <div class="stage-details">
@@ -732,13 +706,9 @@
           <div class="tech-detail">Batch Size: 100 | Temp: 0.2 | format: JSON</div>
         </div>
       </div>
-      </div>
     </div>
-    
-  </section>
 
-  <!-- Interactive Engineering Deep Dive -->
-  <section id="engineering" class="container">
+  <!-- Interactive Engineering Deep Dive --> <section id="engineering" class="container">
     <div class="section-title">
       <h2>Engineering & Optimizations</h2>
       <p>Interactive deep dive into how FrameSpeech achieves maximum efficiency on a 4GB RTX 2050 GPU.</p>
