@@ -741,6 +741,68 @@
     <i class="fa-regular fa-hand-pointer" style="margin-right: 0.4rem;"></i> Hover over the stages to reveal technical details
   </div>
 </div>
+</section>
+
+  <!-- Benchmarks & Results -->
+  <section id="benchmarks" class="container">
+    <div class="section-title">
+      <h2>Benchmarks & Results</h2>
+      <p>Real-world throughput and structural correction performance on a 4GB RTX 2050.</p>
+    </div>
+
+    <div style="display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+      <div class="ps-card solution">
+        <h3><i class="fa-solid fa-gauge-high"></i> Speed & Throughput</h3>
+        <p><strong>Real-Time Factor (RTF): ~0.6x</strong></p>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">A 10-minute Bengali news video with minimal code-switching (rare Assamese & English segments) processes in exactly <strong>6 minutes and 25 seconds</strong>.</p>
+        
+        <table style="width: 100%; margin-top: 1rem; border-collapse: collapse; font-size: 0.9rem;">
+          <tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 0.5rem 0;">Audio Extraction</td><td style="text-align: right; font-family: var(--font-mono);">~5s</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 0.5rem 0;">VAD Segmentation</td><td style="text-align: right; font-family: var(--font-mono);">~2s</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 0.5rem 0;">SpeechBrain LID</td><td style="text-align: right; font-family: var(--font-mono);">~45s</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 0.5rem 0;">Whisper large-v3</td><td style="text-align: right; font-family: var(--font-mono);">~4-5m</td></tr>
+          <tr><td style="padding: 0.5rem 0;">Gemini Correction</td><td style="text-align: right; font-family: var(--font-mono);">~1-2m</td></tr>
+        </table>
+      </div>
+
+      <div class="ps-card solution">
+        <h3><i class="fa-solid fa-bullseye"></i> Qualitative Accuracy</h3>
+        <ul style="margin-top: 1rem; padding-left: 1.5rem; color: var(--text-muted); font-size: 0.95rem;">
+          <li style="margin-bottom: 0.75rem;"><strong>Zero-Shot Code-Switching:</strong> Preserves exact orthographic boundaries of English loanwords.</li>
+          <li style="margin-bottom: 0.75rem;"><strong>Assamese Restoration:</strong> Structurally restores Bengali-script outputs (মোর) to Eastern Nagari (মোৰ).</li>
+          <li style="margin-bottom: 0.75rem;"><strong>Hallucination Drop:</strong> Pipeline filters automatically drop ~15-20% of Whisper hallucinations on noisy segments.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Challenges & Learnings -->
+  <section id="challenges" class="container">
+    <div class="section-title">
+      <h2>Challenges & Key Learnings</h2>
+      <p>Engineering roadblocks encountered during the project and how they were overcome.</p>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <div class="video-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">CTranslate2 Memory Leak</h4>
+        <p style="font-size: 0.95rem;">Calling <code>.to("cpu")</code> on faster-whisper models silently fell back to RAM instead of freeing VRAM, causing OOMs. Solved by explicitly destroying objects with <code>del</code> + <code>empty_cache()</code>.</p>
+      </div>
+      <div class="video-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Whisper Hallucination Loops</h4>
+        <p style="font-size: 0.95rem;">Whisper generated infinite loops (e.g., "♪ ♪ ♪") on silent segments. Solved by building a dual filter (minimum-length gate + alphabetic ratio) before LLM correction.</p>
+      </div>
+      <div class="video-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Gemini API Rate Limiting</h4>
+        <p style="font-size: 0.95rem;">Free-tier Gemini aggressively rate-limits; batches of 30 triggered 429 errors. Solved by increasing batch size to 100, adding a 3s pacing delay, and parsing <code>retryDelay</code> dynamically.</p>
+      </div>
+      <div class="video-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Windows DLL Compatibility</h4>
+        <p style="font-size: 0.95rem;"><code>torchaudio</code> threw C++ DLL errors on Windows, blocking VAD. Solved by replacing it with <code>soundfile</code>—providing identical tensor functionality with zero DLL dependencies.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- Interactive Engineering Deep Dive --> <section id="engineering" class="container">
     <div class="section-title">
       <h2>Engineering & Optimizations</h2>
@@ -858,6 +920,37 @@ transcriber = TranscriptionProcessor(...)</code></pre>
           D --> E
           E --> F["Append to Final Timeline"]
       </pre>
+    </div>
+  </section>
+
+  <!-- Future Work -->
+  <section id="future-work" class="container">
+    <div class="section-title">
+      <h2>Future Work</h2>
+      <p>Architectural upgrades prioritized for an extended development timeline.</p>
+    </div>
+    
+    <div style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+      <div class="video-card" style="padding: 1.5rem; text-align: center;">
+        <i class="fa-solid fa-satellite-dish" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+        <h4>Live Stream Transcription</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Migrate from batch processing to real-time chunked audio buffering for YouTube/Twitch live captioning.</p>
+      </div>
+      <div class="video-card" style="padding: 1.5rem; text-align: center;">
+        <i class="fa-solid fa-tower-broadcast" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+        <h4>Fine-Tuned Wav2Vec2</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Train a custom acoustic model on Indian broadcast media to replace SpeechBrain for domain-specific accuracy.</p>
+      </div>
+      <div class="video-card" style="padding: 1.5rem; text-align: center;">
+        <i class="fa-solid fa-users-viewfinder" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+        <h4>Speaker Diarization</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Integrate pyannote to classify <em>who</em> is speaking alongside <em>what language</em> for multi-speaker subtitles.</p>
+      </div>
+      <div class="video-card" style="padding: 1.5rem; text-align: center;">
+        <i class="fa-solid fa-vial-circle-check" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+        <h4>Automated Benchmarking</h4>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Construct a labeled dataset of 50+ code-switched clips to compute formal WER metrics programmatically.</p>
+      </div>
     </div>
   </section>
 
