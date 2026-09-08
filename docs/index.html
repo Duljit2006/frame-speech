@@ -156,8 +156,31 @@
 
     /* Hero Section */
     .hero {
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
       padding: 4rem 1rem 3rem;
+      text-align: left;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .hero-content {
+      flex: 1.2;
+    }
+
+    .hero-image {
+      flex: 0.8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-image img {
+      max-width: 100%;
+      height: auto;
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
     }
 
     .badge-hero { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: rgba(224, 122, 95, 0.1); border: 1px solid rgba(224, 122, 95, 0.2); border-radius: 9999px; color: var(--primary); font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-heading); }
@@ -180,12 +203,12 @@
       font-size: 1.25rem;
       color: var(--text-muted);
       max-width: 800px;
-      margin: 0 auto 2.5rem;
+      margin: 0 0 2.5rem 0;
     }
 
     .hero-buttons {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 1rem;
       flex-wrap: wrap;
     }
@@ -563,6 +586,22 @@
       color: var(--text-muted);
       font-size: 0.9rem;
     }
+
+    @media (max-width: 900px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+      .hero-content, .hero-image {
+        flex: 1;
+      }
+      .hero-buttons {
+        justify-content: center;
+      }
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -593,20 +632,25 @@
 
   <!-- Hero Section -->
   <section class="container hero">
-    <div class="badge-hero">
-      <i class="fa-solid fa-microchip"></i> Vectorized Inference & LLM Post-Processing
+    <div class="hero-content">
+      <div class="badge-hero">
+        <i class="fa-solid fa-microchip"></i> Vectorized Inference & LLM Post-Processing
+      </div>
+      <h1>Multilingual Code-Switched<br><span class="gradient-text">Audio Transcription Pipeline</span></h1>
+      <p>
+        A 7-stage AI pipeline that perfectly transcribes mixed-language speech and eliminates AI hallucinations.
+      </p>
+      <div class="hero-buttons">
+        <a href="#videos" class="btn-primary">
+          <i class="fa-solid fa-play"></i> Watch Project Videos
+        </a>
+        <a href="https://github.com/Duljit2006/frame-speech" target="_blank" class="btn-secondary">
+          <i class="fa-brands fa-github"></i> View Source Code
+        </a>
+      </div>
     </div>
-    <h1>Multilingual Code-Switched<br><span class="gradient-text">Audio Transcription Pipeline</span></h1>
-    <p>
-      A 7-stage AI pipeline that perfectly transcribes mixed-language speech and eliminates AI hallucinations.
-    </p>
-    <div class="hero-buttons">
-      <a href="#videos" class="btn-primary">
-        <i class="fa-solid fa-play"></i> Watch Project Videos
-      </a>
-      <a href="https://github.com/Duljit2006/frame-speech" target="_blank" class="btn-secondary">
-        <i class="fa-brands fa-github"></i> View Source Code
-      </a>
+    <div class="hero-image">
+      <img src="assets/hero-image.png" alt="Hero Mascot" />
     </div>
   </section>
 
