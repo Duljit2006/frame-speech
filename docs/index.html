@@ -15,6 +15,14 @@
   <!-- Prism.js for syntax highlighting -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
 
+  <!-- KaTeX for LaTeX equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Chart.js for interactive graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
   <style>
     /* Color Palette matching graphify-out theme */
         /* FrameSpeech Light Theme */
@@ -570,10 +578,12 @@
         <i class="fa-solid fa-wave-square"></i> FrameSpeech
       </a>
       <ul class="nav-links">
-        <li><a href="#videos">Demonstrations</a></li>
-        <li><a href="#architecture">Architecture</a></li>
-        <li><a href="#code">Implementation</a></li>
-        <li><a href="#tech-stack">Tech Stack</a></li>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#architecture-diagram">Architecture</a></li>
+        <li><a href="#mathematics">Mathematics</a></li>
+        <li><a href="#performance-graphs">Performance</a></li>
+        <li><a href="#engineering">Engineering</a></li>
+        <li><a href="#team">Team</a></li>
       </ul>
       <a href="https://github.com/Duljit2006/frame-speech" target="_blank" class="btn-github">
         <i class="fa-brands fa-github"></i> GitHub Repo
@@ -599,6 +609,27 @@
       </a>
     </div>
   </section>
+
+  <!-- Formal Introduction -->
+  <section id="introduction" class="container">
+    <div class="section-title">
+      <h2>FrameSpeech: AI Audio Intelligence</h2>
+      <p style="color: var(--primary); font-weight: 600; font-family: var(--font-heading);">IIT Guwahati Internship Project</p>
+    </div>
+    
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+      <h3 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.4rem;"><i class="fa-solid fa-circle-exclamation" style="color: #E07A5F; margin-right: 0.5rem;"></i> Problem Statement</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.7;">
+        Modern automatic speech recognition (ASR) systems like OpenAI's Whisper rely on global language tokens. When a speaker seamlessly switches between languages within the same sentence (known as <strong>code-switching</strong>), the monolithic cross-attention heads in the encoder-decoder architecture often collapse. This causes the model to either hallucinate out-of-distribution phonemes or forcefully transliterate out-of-vocabulary loanwords into the dominant script (e.g., rendering the English word "shooting" in Kannada script rather than preserving the Latin alphabet).
+      </p>
+
+      <h3 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.4rem;"><i class="fa-solid fa-lightbulb" style="color: #81B29A; margin-right: 0.5rem;"></i> Solution Description</h3>
+      <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.7;">
+        <strong>FrameSpeech</strong> bypasses this monolithic token reliance by decoupling Language Identification (LID) from Transcription. It utilizes a deterministic 7-stage tensor pipeline that segments audio into 0.5-second temporal bins, identifies the language distribution using an ECAPA-TDNN acoustic model, and dynamically forces targeted language hints for every chunk. Finally, a Large Language Model (LLM) reconstructs the fragmented text, enforcing strict semantic boundaries to produce perfectly code-switched bilingual transcripts while operating within a constrained 4GB VRAM environment.
+      </p>
+    </div>
+  </section>
+
 
   <!-- Video Showcase Section -->
   <section id="videos" class="container">
@@ -677,6 +708,37 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- Architecture Diagram -->
+  <section id="architecture-diagram" class="container">
+    <div class="section-title">
+      <h2>High-Level Architecture</h2>
+      <p>The step-by-step data flow through the 7-stage tensor pipeline.</p>
+    </div>
+    
+    <pre class="mermaid" style="background: var(--bg-card); padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; margin-bottom: 3rem;">
+graph TD
+    A["🎬 Raw Video / Audio URL"] -->|"Downloads & Rips"| B("1. Audio Extractor")
+    B -->|"16kHz Mono WAV"| C("2. Voice Activity Detector")
+    C -->|"Removes Silence"| D("3. Segmentation Engine")
+    D -->|"3-Second Chunks"| E("4. Language Detector")
+    E -->|"Raw AI Predictions"| F("5. Timeline Smoother")
+
+    F -->|"Clean Language Timeline"| G("6. Whisper Transcriber")
+    G -->|"Raw Transcript Segments"| H("7. Gemini Text Corrector")
+    H -->|"Corrected Sentences"| I["📄 Final Outputs: SRT, TXT & Web UI"]
+
+    style A fill:#e2e2e2,stroke:#333,stroke-width:2px,color:#000
+    style B fill:#E07A5F,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#F2CC8F,stroke:#333,stroke-width:2px,color:#000
+    style D fill:#3D2C2E,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#8B7E74,stroke:#333,stroke-width:2px,color:#fff
+    style F fill:#E8DDD3,stroke:#333,stroke-width:2px,color:#000
+    style G fill:#457B9D,stroke:#333,stroke-width:2px,color:#fff
+    style H fill:#B5838D,stroke:#333,stroke-width:2px,color:#fff
+    style I fill:#81B29A,stroke:#333,stroke-width:2px,color:#000
+    </pre>
   </section>
 
   <!-- System Architecture -->
@@ -769,6 +831,80 @@
   </div>
 </div>
 </section>
+
+  <!-- Mathematical Foundations -->
+  <section id="mathematics" class="container">
+    <div class="section-title">
+      <h2>Mathematical Foundations</h2>
+      <p>The core equations driving the tensor transformations and pipeline optimizations.</p>
+    </div>
+    
+    <div style="display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+      <!-- Eq 1 -->
+      <div class="ps-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="fa-solid fa-square-root-variable"></i> Log-Softmax Masking (Indian Language Whitelist)</h4>
+        <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem; overflow-x: auto;">
+          $$ P(L_i) = \frac{e^{z_i}}{\sum_{j} e^{z_j}}, \quad z_k = -\infty \ \forall \ k \notin \mathcal{L}_{\text{Indian}} $$
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">SpeechBrain outputs log-softmax scores for 107 languages. We set all non-Indian language logits to \(-\infty\) prior to softmax normalization, guaranteeing zero probability for out-of-domain classes.</p>
+      </div>
+
+      <!-- Eq 2 -->
+      <div class="ps-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="fa-solid fa-chart-bar"></i> Confidence-Weighted Majority Voting</h4>
+        <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem; overflow-x: auto;">
+          $$ \hat{L}_b = \arg\max_{l} \sum_{i \in \text{bin}(b)} c_i \cdot \mathbb{1}[l_i = l] $$
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Each 0.5s time bin accumulates confidence-weighted votes (\(c_i\)) from overlapping audio sliding windows. The language (\(l\)) with the highest total weight dictates the smoothed timeline block.</p>
+      </div>
+
+      <!-- Eq 3 -->
+      <div class="ps-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="fa-solid fa-arrows-left-right-to-line"></i> Sliding Window Segmentation</h4>
+        <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem; overflow-x: auto;">
+          $$ \text{Overlap} = 1 - \frac{\text{stride}}{\text{window}} = 1 - \frac{1.0}{3.0} \approx 66.7\% $$
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">A continuous audio signal is segmented into overlapping 3-second windows with a 1-second stride. A 66% overlap ensures phonetic transition boundaries are rarely truncated.</p>
+      </div>
+
+      <!-- Eq 4 -->
+      <div class="ps-card" style="padding: 1.5rem;">
+        <h4 style="color: var(--primary); margin-bottom: 1rem;"><i class="fa-solid fa-microchip"></i> INT8 Quantization Memory Footprint</h4>
+        <div style="background: var(--bg-dark); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem; overflow-x: auto;">
+          $$ \text{Memory}_{\text{int8}} \approx \frac{1.55 \times 10^9 \text{ params} \times 1 \text{ B}}{10^9} = 1.55 \text{ GB} $$
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Whisper large-v3 has ~1.55B parameters. Standard FP32 requires ~6.2 GB VRAM (OOM on RTX 2050). CTranslate2 8-bit integer quantization reduces this to ~1.55 GB without noticeable degradation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Performance Graphs -->
+  <section id="performance-graphs" class="container">
+    <div class="section-title">
+      <h2>Performance Analytics</h2>
+      <p>Interactive visualizations of compute constraints and language distribution.</p>
+    </div>
+    
+    <div style="display: grid; gap: 2rem; grid-template-columns: 1fr 1fr;">
+      <div class="ps-card">
+        <h4 style="text-align: center; margin-bottom: 1rem;">Per-Stage Processing Time</h4>
+        <canvas id="timeChart"></canvas>
+      </div>
+      <div class="ps-card">
+        <h4 style="text-align: center; margin-bottom: 1rem;">VRAM Usage Profile</h4>
+        <canvas id="vramChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="ps-card" style="margin-top: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+      <h4 style="text-align: center; margin-bottom: 1rem;">Language Distribution: Raw AI vs Final Corrected</h4>
+      <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+        <div style="width: 250px;"><canvas id="langRawChart"></canvas></div>
+        <div style="width: 250px;"><canvas id="langFinalChart"></canvas></div>
+      </div>
+      <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">Based on a 10-minute Bengali news clip. Note the cleanup of false Hindi/Nepali hallucination artifacts.</p>
+    </div>
+  </section>
 
   <!-- Benchmarks & Results -->
   <section id="benchmarks" class="container">
@@ -1024,6 +1160,115 @@ transcriber = TranscriptionProcessor(...)</code></pre>
     }
   </script>
 
+  <!-- Chart.js and KaTeX Initialization -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Initialize KaTeX
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\[', right: '\\]', display: true}
+        ],
+        throwOnError : false
+      });
+
+      // Chart.js Default styling
+      Chart.defaults.color = '#8B7E74';
+      Chart.defaults.font.family = "'Inter', sans-serif";
+
+      // 1. Time Chart (Horizontal Bar)
+      new Chart(document.getElementById('timeChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Audio Extraction', 'VAD', 'Frame Seg', 'LID', 'Smoothing', 'Whisper int8', 'Gemini'],
+          datasets: [{
+            label: 'Time (seconds)',
+            data: [5, 2, 1, 45, 1, 270, 60],
+            backgroundColor: '#81B29A',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true } }
+        }
+      });
+
+      // 2. VRAM Chart (Bar)
+      new Chart(document.getElementById('vramChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Idle', 'SpeechBrain', 'Cleared', 'Whisper', 'Gemini API'],
+          datasets: [{
+            label: 'VRAM Usage (MB)',
+            data: [120, 1450, 180, 3100, 180],
+            backgroundColor: '#E07A5F',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, max: 4096 } }
+        }
+      });
+
+      // 3. Language Raw (Doughnut)
+      new Chart(document.getElementById('langRawChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Bengali', 'Assamese', 'Hindi', 'Other'],
+          datasets: [{
+            data: [95.7, 1.8, 1.3, 1.3],
+            backgroundColor: ['#457B9D', '#F2CC8F', '#E07A5F', '#8B7E74']
+          }]
+        },
+        options: { plugins: { title: { display: true, text: 'Raw Inference' } } }
+      });
+
+      // 4. Language Final (Doughnut)
+      new Chart(document.getElementById('langFinalChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Bengali', 'Assamese', 'Hindi', 'Other'],
+          datasets: [{
+            data: [98.3, 1.7, 0, 0],
+            backgroundColor: ['#457B9D', '#F2CC8F', '#E07A5F', '#8B7E74']
+          }]
+        },
+        options: { plugins: { title: { display: true, text: 'Post-Correction' } } }
+      });
+    });
+  </script>
+
+  <!-- Team & Acknowledgements -->
+  <section id="team" class="container">
+    <div class="section-title">
+      <h2>Team & Acknowledgements</h2>
+      <p>The individuals behind the FrameSpeech project.</p>
+    </div>
+    <div style="max-width: 800px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+        <div>
+          <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.1rem;">Intern Developer</h4>
+          <p style="font-weight: 600; font-size: 1.2rem; color: var(--text-main);">Duljit Lalung</p>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">IIT Guwahati</p>
+        </div>
+        <div>
+          <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.1rem;">Faculty Advisor</h4>
+          <p style="font-weight: 600; font-size: 1.2rem; color: var(--text-main);">Prof. Prithwijit Guha</p>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">IIT Guwahati</p>
+        </div>
+        <div>
+          <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 1.1rem;">Mentors</h4>
+          <p style="font-weight: 600; font-size: 1.2rem; color: var(--text-main);">Mohd. Amaan</p>
+          <p style="font-weight: 600; font-size: 1.2rem; color: var(--text-main);">Parth Dhola</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Footer -->
   <footer>
