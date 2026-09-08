@@ -180,7 +180,10 @@
     .hero-image img {
       max-width: 100%;
       height: auto;
-      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
+      filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));
+      /* Creates a smooth fade-out effect at the bottom so the image doesn't cut off suddenly */
+      -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
     }
 
     .badge-hero { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: rgba(224, 122, 95, 0.1); border: 1px solid rgba(224, 122, 95, 0.2); border-radius: 9999px; color: var(--primary); font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-heading); }
