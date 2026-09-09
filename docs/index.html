@@ -478,33 +478,41 @@
     /* Interactive Tabs System */
     .tabs-nav {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 1rem;
+      gap: 0.5rem;
+      margin: 0 auto 2.5rem auto;
+      background: var(--bg-card);
+      padding: 0.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
       overflow-x: auto;
+      width: fit-content;
     }
     .tab-btn {
-      background: none;
-      border: none;
+      background: transparent;
+      border: 1px solid transparent;
       font-family: var(--font-heading);
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 8px;
       transition: all 0.2s ease;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
     .tab-btn:hover {
-      background: rgba(224, 122, 95, 0.05);
-      color: var(--primary);
+      background: var(--bg-dark);
+      color: var(--text-main);
     }
     .tab-btn.active {
       background: rgba(224, 122, 95, 0.1);
       color: var(--primary);
-      box-shadow: inset 0 -3px 0 var(--primary);
+      border: 1px solid rgba(224, 122, 95, 0.2);
+      box-shadow: 0 2px 4px rgba(224, 122, 95, 0.05);
     }
     .tab-content {
       position: absolute;
