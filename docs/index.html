@@ -418,7 +418,7 @@
     }
 
     .stage-card:hover {
-      width: 380px;
+      width: 450px;
     }
     
     .stage-card h4 {
@@ -432,7 +432,7 @@
     }
     
     .stage-details {
-      width: 340px; /* Keep text wrap fixed during animation */
+      width: 410px; /* Keep text wrap fixed during animation */
       max-height: 0;
       opacity: 0;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -460,7 +460,7 @@
         align-items: center;
       }
       .pipeline-grid-staircase > div { grid-column: auto !important; grid-row: auto !important; }
-      .stage-card.collapsed { width: 100%; max-width: 380px; }
+      .stage-card.collapsed { width: 100%; max-width: 450px; }
       
     .pipeline-grid-staircase:has(.stage-card:hover) .stage-card:not(:hover) {
       width: 190px;
@@ -470,7 +470,7 @@
       opacity: 0;
     }
 
-    .stage-card:hover { width: 100%; max-width: 380px; }
+    .stage-card:hover { width: 100%; max-width: 450px; }
       .stage-details { width: 100%; }
       .row-connector, .stage-connector { transform: rotate(90deg) !important; height: 2rem; width: 100%; }
     }
@@ -1117,7 +1117,7 @@ graph TD
     <div class="stage-number">Stage 01</div>
     <h4><i class="fa-solid fa-file-audio" style="color: #E07A5F;"></i> Audio Extractor</h4>
     <div class="stage-details">
-      <p>Uses <code>yt-dlp</code> and <code>ffmpeg-python</code>. Resamples input streams to 16kHz, downmixes to mono (<code>ac=1</code>), and forces PCM 16-bit little-endian (<code>pcm_s16le</code>) encoding to normalize mel-spectrogram generation.</p>
+      <p>Downloads audio from YouTube videos using <code>yt-dlp</code>. It then uses <code>FFmpeg</code> to standardize the audio—converting it into a simple mono track at a consistent 16kHz rate so the AI models can process it easily.</p>
       <div class="tech-detail">Sample Rate: 16000Hz | Channels: 1</div>
     </div>
   </div>
@@ -1126,7 +1126,7 @@ graph TD
     <div class="stage-number">Stage 02</div>
     <h4><i class="fa-solid fa-microphone-slash" style="color: #F2CC8F;"></i> Silero VAD</h4>
     <div class="stage-details">
-      <p>Evaluates <code>float32</code> audio tensors via a lightweight PyTorch neural VAD. Identifies active speech indices against a strict probability threshold to strip compute-heavy silence.</p>
+      <p>Uses a lightweight Voice Activity Detection (VAD) model to scan the audio. It perfectly identifies exactly when someone is speaking and strips away all the background silence, saving massive amounts of processing time.</p>
       <div class="tech-detail">Confidence Threshold: &ge; 0.50</div>
     </div>
   </div>
@@ -1139,7 +1139,7 @@ graph TD
     <div class="stage-number">Stage 03</div>
     <h4><i class="fa-solid fa-scissors" style="color: #e2e8f0;"></i> Segmentation</h4>
     <div class="stage-details">
-      <p>Generates sequential overlapping audio frames using a targeted sliding window algorithm to ensure boundary phonetic transitions are fully captured for the classifier.</p>
+      <p>Chops the continuous speech into small 3-second overlapping blocks. By slightly overlapping the blocks, we ensure that words cut off at the edge of a block aren't lost and are properly analyzed.</p>
       <div class="tech-detail">Window: 3.0s | Stride: 1.0s | Overlap: 66%</div>
     </div>
   </div>
@@ -1148,7 +1148,7 @@ graph TD
     <div class="stage-number">Stage 04</div>
     <h4><i class="fa-solid fa-language" style="color: #8B7E74;"></i> SpeechBrain LID</h4>
     <div class="stage-details">
-      <p>Executes vectorized inference on 107-class ECAPA-TDNN embeddings. Applies an <code>-inf</code> log-softmax mask to filter out non-Indian language classes prior to activation.</p>
+      <p>Uses SpeechBrain's language detection AI to guess what language is spoken in each block. We mathematically block out non-Indian languages (like French or German) to force the AI to only pick from our target languages (e.g. Hindi, English, Bengali).</p>
       <div class="tech-detail">Batch Size: 32 | Fallback Threshold: &lt; 0.70</div>
     </div>
   </div>
@@ -1161,7 +1161,7 @@ graph TD
     <div class="stage-number">Stage 05</div>
     <h4><i class="fa-solid fa-filter" style="color: #E8DDD3;"></i> Timeline Smoother</h4>
     <div class="stage-details">
-      <p>Consolidates raw predictions via non-linear median filtering and confidence-weighted majority voting across 0.5s bins. Applies multi-pass glitch absorption for blocks under 2.5s.</p>
+      <p>Since raw AI predictions can be jittery, this stage acts as a smoothing filter. If the AI detects 'Hindi, English, Hindi' in rapid succession, the smoother corrects it into a stable, logical language timeline, ignoring momentary glitches.</p>
       <div class="tech-detail">Time Bin Resolution: 0.5s</div>
     </div>
   </div>
@@ -1170,7 +1170,7 @@ graph TD
     <div class="stage-number">Stage 06</div>
     <h4><i class="fa-solid fa-pen-nib" style="color: #457B9D;"></i> faster-whisper</h4>
     <div class="stage-details">
-      <p>Executes CTranslate2 int8 quantized transcription. Disables internal redundant VAD. Applies gated language hinting and drops segments where <code>alpha_count &lt; length * 0.3</code>.</p>
+      <p>The heavy lifter. Powered by OpenAI's Whisper (optimized for 4GB RAM), this engine takes the cleaned audio and our predicted language hints to perfectly transcribe each chunk in the correct alphabet.</p>
       <div class="tech-detail">Hint Gate: &ge; 0.85 | Quantization: int8</div>
     </div>
   </div>
@@ -1183,7 +1183,7 @@ graph TD
     <div class="stage-number">Stage 07</div>
     <h4><i class="fa-solid fa-wand-magic-sparkles" style="color: #B5838D;"></i> Gemini AI Corrector</h4>
     <div class="stage-details">
-      <p>Restructures textual fragments into complete sentences while enforcing zero-shot code-switching rules. Utilizes strict JSON schema parsing and dynamic exponential backoff on 429 errors.</p>
+      <p>The final editor. Google Gemini receives the raw, fragmented transcripts and logically stitches them back together into fluent, readable sentences while strictly preserving the mixed-language (code-switched) words exactly as spoken.</p>
       <div class="tech-detail">Batch Size: 100 | Temp: 0.2 | format: JSON</div>
     </div>
   </div>
