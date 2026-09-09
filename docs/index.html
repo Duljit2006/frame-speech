@@ -1291,33 +1291,6 @@ graph TD
     </div>
   </section>
 
-  <!-- Challenges & Learnings -->
-  <section id="challenges" class="container">
-    <div class="section-title">
-      <h2>Challenges & Key Learnings</h2>
-      <p>Engineering roadblocks encountered during the project and how they were overcome.</p>
-    </div>
-    
-    <div style="display: flex; flex-direction: column; gap: 1rem;">
-      <div class="video-card" style="padding: 1.5rem;">
-        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">CTranslate2 Memory Leak</h4>
-        <p style="font-size: 0.95rem;">Calling <code>.to("cpu")</code> on faster-whisper models silently fell back to RAM instead of freeing VRAM, causing OOMs. Solved by explicitly destroying objects with <code>del</code> + <code>empty_cache()</code>.</p>
-      </div>
-      <div class="video-card" style="padding: 1.5rem;">
-        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Whisper Hallucination Loops</h4>
-        <p style="font-size: 0.95rem;">Whisper generated infinite loops (e.g., "♪ ♪ ♪") on silent segments. Solved by building a dual filter (minimum-length gate + alphabetic ratio) before LLM correction.</p>
-      </div>
-      <div class="video-card" style="padding: 1.5rem;">
-        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Gemini API Rate Limiting</h4>
-        <p style="font-size: 0.95rem;">Free-tier Gemini aggressively rate-limits; batches of 30 triggered 429 errors. Solved by increasing batch size to 100, adding a 3s pacing delay, and parsing <code>retryDelay</code> dynamically.</p>
-      </div>
-      <div class="video-card" style="padding: 1.5rem;">
-        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Windows DLL Compatibility</h4>
-        <p style="font-size: 0.95rem;"><code>torchaudio</code> threw C++ DLL errors on Windows, blocking VAD. Solved by replacing it with <code>soundfile</code>—providing identical tensor functionality with zero DLL dependencies.</p>
-      </div>
-    </div>
-  </section>
-
   <!-- Interactive Engineering Deep Dive --> <section id="engineering" class="container">
     <div class="section-title">
       <h2>Engineering & Optimizations</h2>
