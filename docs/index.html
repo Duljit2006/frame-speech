@@ -628,6 +628,125 @@
         font-size: 2.5rem;
       }
     }
+
+    /* Challenges vs FrameSpeech Section */
+    .challenges-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .challenge-card {
+      position: relative;
+      height: 280px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .challenge-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .challenge-card:hover .challenge-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .challenge-front, .challenge-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .challenge-front {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .challenge-front .challenge-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: rgba(224, 122, 95, 0.1);
+      color: var(--primary);
+    }
+
+    .challenge-front h4 {
+      font-size: 1.15rem;
+      color: var(--text-main);
+      margin-bottom: 0.6rem;
+    }
+
+    .challenge-front p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .challenge-front .flip-hint {
+      position: absolute;
+      bottom: 1rem;
+      right: 1.2rem;
+      font-size: 0.75rem;
+      color: var(--primary);
+      font-weight: 600;
+      opacity: 0.7;
+      font-family: var(--font-heading);
+      letter-spacing: 0.03em;
+    }
+
+    .challenge-back {
+      background: linear-gradient(135deg, #3D2C2E 0%, #5a3e40 100%);
+      border: 1px solid rgba(224, 122, 95, 0.3);
+      transform: rotateY(180deg);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .challenge-back .solution-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(129, 178, 154, 0.2);
+      border: 1px solid rgba(129, 178, 154, 0.3);
+      color: #81B29A;
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+      width: fit-content;
+      font-family: var(--font-heading);
+    }
+
+    .challenge-back h4 {
+      font-size: 1.1rem;
+      color: #F2CC8F;
+      margin-bottom: 0.6rem;
+    }
+
+    .challenge-back p {
+      font-size: 0.92rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.65;
+    }
   </style>
 </head>
 <body>
@@ -699,6 +818,120 @@
       <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.7;">
         <strong>FrameSpeech</strong> solves this by rethinking how we process audio. Instead of trying to transcribe the entire audio file at once, it chops the audio into tiny 0.5-second chunks. It uses a specialized AI to detect exactly which language is being spoken in each specific moment. Armed with this knowledge, FrameSpeech guides the transcription engine chunk-by-chunk. Finally, a smart text-correction AI (Google Gemini) acts as an editor, stitching these tiny transcriptions together to produce perfectly accurate, mixed-language text—all while running efficiently on standard laptops with only 4GB of graphics memory.
       </p>
+    </div>
+  </section>
+
+  <!-- Why Existing Tech Fails & How FrameSpeech Fixes It -->
+  <section id="challenges-comparison" class="container">
+    <div class="section-title">
+      <h2>Why Existing Technology Fails</h2>
+      <p>Hover over each card to see how FrameSpeech tackles the problem.</p>
+    </div>
+
+    <div class="challenges-grid">
+
+      <!-- Card 1: Language Lock-In -->
+      <div class="challenge-card">
+        <div class="challenge-card-inner">
+          <div class="challenge-front">
+            <div class="challenge-icon"><i class="fa-solid fa-lock"></i></div>
+            <h4>Single Language Lock-In</h4>
+            <p>Traditional ASR systems like Whisper require you to pick one language before transcription starts. If someone speaks Bengali and suddenly says an English phrase, the AI ignores or garbles the English entirely.</p>
+            <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Hover for solution</span>
+          </div>
+          <div class="challenge-back">
+            <div class="solution-badge"><i class="fa-solid fa-check"></i> FrameSpeech Fix</div>
+            <h4>Dynamic Per-Chunk Language Detection</h4>
+            <p>FrameSpeech identifies the language of every 0.5-second audio chunk independently using SpeechBrain's ECAPA-TDNN model, then feeds the correct language hint for each chunk to Whisper—so no language is ever ignored.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Hallucinations -->
+      <div class="challenge-card">
+        <div class="challenge-card-inner">
+          <div class="challenge-front">
+            <div class="challenge-icon"><i class="fa-solid fa-ghost"></i></div>
+            <h4>AI Hallucinations</h4>
+            <p>When Whisper encounters silence, music, or unfamiliar sounds, it often "hallucinates"—generating fake text that was never spoken. This can produce entire phantom sentences that pollute your transcript.</p>
+            <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Hover for solution</span>
+          </div>
+          <div class="challenge-back">
+            <div class="solution-badge"><i class="fa-solid fa-check"></i> FrameSpeech Fix</div>
+            <h4>Multi-Layer Hallucination Filtering</h4>
+            <p>FrameSpeech uses regex-based pattern detection to catch known hallucination phrases, applies VAD (Voice Activity Detection) to skip non-speech segments, and uses Gemini AI as a final editor to remove any remaining artifacts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Script Corruption -->
+      <div class="challenge-card">
+        <div class="challenge-card-inner">
+          <div class="challenge-front">
+            <div class="challenge-icon"><i class="fa-solid fa-font"></i></div>
+            <h4>Script & Alphabet Corruption</h4>
+            <p>When code-switching occurs, Whisper often writes English words using the local script (e.g., "shooting" rendered in Devanagari or Kannada), making the transcript unreadable and losing the original meaning.</p>
+            <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Hover for solution</span>
+          </div>
+          <div class="challenge-back">
+            <div class="solution-badge"><i class="fa-solid fa-check"></i> FrameSpeech Fix</div>
+            <h4>Language-Aware Transcription Hints</h4>
+            <p>By knowing exactly which language is spoken at each moment, FrameSpeech forces Whisper to use the correct alphabet for each chunk. English words stay in Latin script, Bengali stays in Bengali script—perfectly preserved.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: GPU Memory -->
+      <div class="challenge-card">
+        <div class="challenge-card-inner">
+          <div class="challenge-front">
+            <div class="challenge-icon"><i class="fa-solid fa-memory"></i></div>
+            <h4>Massive GPU Memory Requirements</h4>
+            <p>Running multiple AI models simultaneously (language detection + transcription + text correction) normally demands 16GB+ of GPU memory, making it impossible to run on standard laptops or affordable hardware.</p>
+            <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Hover for solution</span>
+          </div>
+          <div class="challenge-back">
+            <div class="solution-badge"><i class="fa-solid fa-check"></i> FrameSpeech Fix</div>
+            <h4>Sequential Load-Unload Architecture</h4>
+            <p>FrameSpeech loads only one model at a time into GPU memory, then completely unloads it before loading the next. Combined with INT8 quantization, the entire pipeline fits within just 4GB of VRAM.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Fragmented Output -->
+      <div class="challenge-card">
+        <div class="challenge-card-inner">
+          <div class="challenge-front">
+            <div class="challenge-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+            <h4>Fragmented, Choppy Output</h4>
+            <p>Processing audio in small chunks typically produces disconnected sentence fragments with broken grammar, repeated words, and missing context—making the final transcript nearly unusable without manual editing.</p>
+            <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Hover for solution</span>
+          </div>
+          <div class="challenge-back">
+            <div class="solution-badge"><i class="fa-solid fa-check"></i> FrameSpeech Fix</div>
+            <h4>LLM-Powered Text Reconstruction</h4>
+            <p>Google Gemini acts as an intelligent editor—it receives the raw chunk transcriptions and reconstructs them into natural, fluent sentences while preserving every code-switched word exactly as spoken.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: No Real-Time Feedback -->
+      <div class="challenge-card">
+        <div class="challenge-card-inner">
+          <div class="challenge-front">
+            <div class="challenge-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+            <h4>Black-Box Processing</h4>
+            <p>Most transcription tools just show a loading spinner. You have no idea what's happening, how far along the process is, or whether the system is stuck—leading to frustration during long audio files.</p>
+            <span class="flip-hint"><i class="fa-solid fa-rotate"></i> Hover for solution</span>
+          </div>
+          <div class="challenge-back">
+            <div class="solution-badge"><i class="fa-solid fa-check"></i> FrameSpeech Fix</div>
+            <h4>Real-Time SSE Streaming UI</h4>
+            <p>FrameSpeech streams live progress updates to the browser using Server-Sent Events (SSE). You see each pipeline stage complete in real-time with a visual stepper, timer, and live language distribution charts.</p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
