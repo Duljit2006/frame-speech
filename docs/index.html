@@ -644,6 +644,7 @@
       </a>
       <ul class="nav-links">
         <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#setup">Setup</a></li>
         <li><a href="#architecture-diagram">Architecture</a></li>
         <li><a href="#mathematics">Mathematics</a></li>
         <li><a href="#performance-graphs">Performance</a></li>
@@ -744,6 +745,53 @@
         <div class="video-description">
           Live VRAM profiling and FastAPI execution. Demonstrates the ingestion of standard float32 audio tensors, SSE asynchronous streaming, and dual analytic representations of output.
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Setup & Installation -->
+  <section id="setup" class="container">
+    <div class="section-title">
+      <h2>🛠️ Setup & Installation</h2>
+      <p>Follow these steps to run FrameSpeech locally on your machine.</p>
+    </div>
+
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+      <h3 style="color: var(--primary); margin-bottom: 1rem; font-family: var(--font-heading);"><i class="fa-solid fa-clipboard-list" style="margin-right: 0.5rem;"></i> Prerequisites</h3>
+      <ul style="color: var(--text-muted); margin-bottom: 2.5rem; padding-left: 1.5rem; line-height: 1.8; font-size: 1.05rem;">
+        <li>Windows/Linux with <strong>Python 3.11+</strong></li>
+        <li><strong>FFmpeg</strong> installed and in your system PATH</li>
+        <li>An NVIDIA GPU (4GB+ VRAM recommended) for CUDA acceleration</li>
+      </ul>
+
+      <div style="margin-bottom: 2rem;">
+        <h4 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: var(--font-heading);">1. Clone the repository</h4>
+        <pre><code class="language-bash">git clone https://github.com/Duljit2006/frame-speech.git
+cd frame-speech</code></pre>
+      </div>
+
+      <div style="margin-bottom: 2rem;">
+        <h4 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: var(--font-heading);">2. Set up the virtual environment</h4>
+        <pre><code class="language-bash">cd lid-pipeline
+python -m venv venv
+venv\Scripts\activate</code></pre>
+      </div>
+
+      <div style="margin-bottom: 2rem;">
+        <h4 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: var(--font-heading);">3. Environment Variables</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.95rem;">Rename the <code>.env.example</code> file in the project root directory to <code>.env</code> and add your Google Gemini API key (required for Model 3 Text Correction):</p>
+        <pre><code class="language-bash">GEMINI_API_KEY="your_api_key_here"</code></pre>
+      </div>
+
+      <div style="margin-bottom: 2rem;">
+        <h4 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: var(--font-heading);">4. Install dependencies</h4>
+        <pre><code class="language-bash">pip install -r requirements.txt</code></pre>
+      </div>
+
+      <div>
+        <h4 style="color: var(--text-main); margin-bottom: 0.5rem; font-family: var(--font-heading);">5. Run the Application</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.95rem;">If you are on Windows, simply double-click the <code>start_server.bat</code> file in the root directory! Alternatively, run:</p>
+        <pre><code class="language-bash">python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000</code></pre>
       </div>
     </div>
   </section>
