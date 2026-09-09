@@ -160,18 +160,18 @@
       align-items: center;
       justify-content: space-between;
       gap: 2rem;
-      padding: 4rem 1rem 3rem;
+      padding: 4rem 2rem 3rem;
       text-align: left;
-      max-width: 1200px;
+      max-width: 1500px; /* Increased from 1200px to reduce left/right gap */
       margin: 0 auto;
     }
     
     .hero-content {
-      flex: 1.2;
+      flex: 1.1; /* Slightly more space for text */
     }
 
     .hero-image {
-      flex: 0.8;
+      flex: 0.9; /* Larger image area */
       display: flex;
       justify-content: center;
       align-items: flex-end; /* Shift image to the bottom-most part of the box */
@@ -181,10 +181,14 @@
     .hero-image img {
       max-width: 100%;
       height: auto;
+      transform: scale(1.15); /* Make the image visibly larger */
+      transform-origin: bottom right; /* Keep it anchored to bottom right while scaling */
       filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));
-      /* Smooth fade-out at bottom and right side */
-      -webkit-mask-image: linear-gradient(to bottom right, black 30%, transparent 100%);
-      mask-image: linear-gradient(to bottom right, black 30%, transparent 100%);
+      /* Precise fade out for just the bottom and right edges, keeping the rest solid */
+      -webkit-mask-image: linear-gradient(to right, black 80%, transparent 98%), linear-gradient(to bottom, black 80%, transparent 98%);
+      -webkit-mask-composite: source-in;
+      mask-image: linear-gradient(to right, black 80%, transparent 98%), linear-gradient(to bottom, black 80%, transparent 98%);
+      mask-composite: intersect;
     }
 
     .hanging-img {
