@@ -174,16 +174,33 @@
       flex: 0.8;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-end; /* Shift image to the bottom-most part of the box */
+      align-self: flex-end; /* Align the flex item itself to the bottom */
     }
 
     .hero-image img {
       max-width: 100%;
       height: auto;
       filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));
-      /* Creates a smooth fade-out effect at the bottom so the image doesn't cut off suddenly */
-      -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-      mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+      /* Smooth fade-out at bottom and right side */
+      -webkit-mask-image: linear-gradient(to bottom right, black 30%, transparent 100%);
+      mask-image: linear-gradient(to bottom right, black 30%, transparent 100%);
+    }
+
+    .hanging-img {
+      position: absolute;
+      top: 100%; /* Hang directly from the bottom edge of the sticky header */
+      right: 18%; /* Position it nicely between the nav and the github button */
+      width: 120px; /* Small size */
+      z-index: 90;
+      animation: swing 4s ease-in-out infinite alternate;
+      transform-origin: top center;
+      pointer-events: none; /* So it doesn't block clicks on links below it */
+    }
+    
+    @keyframes swing {
+      0% { transform: rotate(8deg); }
+      100% { transform: rotate(-8deg); }
     }
 
     .badge-hero { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; background: rgba(224, 122, 95, 0.1); border: 1px solid rgba(224, 122, 95, 0.2); border-radius: 9999px; color: var(--primary); font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-heading); }
@@ -631,6 +648,7 @@
         <i class="fa-brands fa-github"></i> GitHub Repo
       </a>
     </div>
+    <img src="assets/hanging.png" class="hanging-img" alt="Hanging Spider-Gwen" />
   </header>
 
   <!-- Hero Section -->
