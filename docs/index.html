@@ -163,6 +163,7 @@
       padding: 4rem 2rem 3rem;
       text-align: left;
       max-width: 1500px; /* Increased from 1200px to reduce left/right gap */
+      min-height: calc(100vh - 85px); /* Take full screen height minus header */
       margin: 0 auto;
     }
     
@@ -195,7 +196,8 @@
       position: absolute;
       top: 100%; /* Hang directly from the bottom edge of the sticky header */
       right: 18%; /* Position it nicely between the nav and the github button */
-      width: 120px; /* Small size */
+      height: 90px; /* Restrict height so it is very small and doesn't stretch down */
+      width: auto;
       z-index: 90;
       animation: swing 4s ease-in-out infinite alternate;
       transform-origin: top center;
